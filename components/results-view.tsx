@@ -217,7 +217,13 @@ function ScreenSection({
 
 // ── Root ─────────────────────────────────────────────────────────────
 
-export default function ResultsView({ report }: { report: RunReport }) {
+export default function ResultsView({
+  report,
+  initialView = "user",
+}: {
+  report: RunReport;
+  initialView?: "user" | "screen";
+}) {
   const screens = useMemo(() => new Map(report.screens.map((s) => [s.id, s])), [report]);
   const personas = useMemo(
     () =>
@@ -233,7 +239,7 @@ export default function ResultsView({ report }: { report: RunReport }) {
     [report],
   );
 
-  const [view, setView] = useState<"user" | "screen">("user");
+  const [view, setView] = useState<"user" | "screen">(initialView);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set([personas[0]?.id]));
 
   const reached = report.personas.filter((p) => p.outcome !== "dropped").length;
@@ -273,22 +279,22 @@ export default function ResultsView({ report }: { report: RunReport }) {
 
       {/* Summary strip */}
       <div className="rise mb-6 grid grid-cols-3 divide-x divide-line overflow-hidden rounded-lg border border-line bg-card shadow-[0_1px_2px_rgba(34,29,20,0.05)]" style={{ animationDelay: "60ms" }}>
-        <div className="px-4 py-4 sm:px-5">
+        <div className="min-w-0 px-3 py-4 sm:px-5">
           <p className="font-display text-3xl font-semibold tabular-nums sm:text-4xl">{total}</p>
-          <p className="mt-1 text-xs text-ink-soft">users tested</p>
+          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">users tested</p>
         </div>
-        <div className="px-4 py-4 sm:px-5">
+        <div className="min-w-0 px-3 py-4 sm:px-5">
           <p className={`font-display text-3xl font-semibold tabular-nums sm:text-4xl ${reached < total / 2 ? "text-bad" : ""}`}>
             {reached}
             <span className="text-lg text-ink-soft sm:text-xl"> of {total}</span>
           </p>
-          <p className="mt-1 text-xs text-ink-soft">reached the end</p>
+          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">reached the end</p>
         </div>
-        <div className="px-4 py-4 sm:px-5">
-          <p className="truncate font-display text-xl font-semibold leading-[1.15] sm:text-2xl">
+        <div className="min-w-0 px-3 py-4 sm:px-5">
+          <p className="truncate font-display text-xl font-semibold leading-[1.6rem] sm:text-2xl sm:leading-[2.5rem]">
             {worstScreen?.label}
           </p>
-          <p className="mt-1 text-xs text-ink-soft">worst screen</p>
+          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">worst screen</p>
         </div>
       </div>
 

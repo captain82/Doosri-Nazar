@@ -2,9 +2,14 @@ import Link from "next/link";
 import ResultsView from "@/components/results-view";
 import { FAKE_REPORT } from "@/lib/fake-run";
 
-export default function RunPage() {
+export default function RunPage({
+  searchParams,
+}: {
+  searchParams: { view?: string };
+}) {
   // route param becomes the fetch key once the real pipeline exists
   const report = FAKE_REPORT;
+  const initialView = searchParams.view === "screen" ? "screen" : "user";
 
   return (
     <main>
@@ -18,7 +23,7 @@ export default function RunPage() {
           </span>
         </div>
       </nav>
-      <ResultsView report={report} />
+      <ResultsView report={report} initialView={initialView} />
     </main>
   );
 }
