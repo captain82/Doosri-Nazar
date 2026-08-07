@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Doosri Nazar · दूसरी नज़र
 
-## Getting Started
+**A second look at your design — through the eyes of the other India.**
 
-First, run the development server:
+Live: **https://doosri-nazar.vercel.app** · Sample report: [/runs/demo](https://doosri-nazar.vercel.app/runs/demo)
+
+## The problem
+
+Most software in India is designed and tested by people with new phones, fast internet and good English. Everyone else gets designed out — not deliberately, just invisibly. Real field testing is the right answer, but it's slow and expensive, so teams skip it entirely.
+
+## What it does
+
+Upload screenshots of a flow and describe what it does. Doosri Nazar generates AI users grounded in real non-urban Indian context — language, device age, connection speed, digital literacy, proxy use (operating an app on someone else's behalf) — and walks each one through your screens **in order, never seeing ahead**, so confusion accumulates the way it does for a real first-time user.
+
+The output is a field report: where each user got stuck, what it cost them, and what to change.
+
+Two details make this a measurement tool rather than an essay generator:
+
+- **Drop-off is real.** Personas can quit. "2 of 5 reached the end" only means something because quitting was possible.
+- **Load times are computed, never generated.** Screen weight ÷ connection speed (2G/3G/4G) is passed *into* the simulation as a fact the persona experiences.
+
+This is not a replacement for going to a village and watching someone use your app. It's the cheap first pass that clears the obvious breaks, so real field time is spent on what only real people can tell you.
+
+## Stack
+
+Next.js 14 (App Router, TypeScript) · Tailwind · Supabase (auth, DB, storage) · Anthropic Claude (vision) · Vercel
+
+## Run it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Backend pipeline (Supabase + Anthropic) is in progress; the sample report at `/runs/demo` renders from `lib/fake-run.ts`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Credit
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built for the [BestPossible.AI](https://bestpossible.ai) hackathon, building on the **Rural AI User Testing** idea from the Idea Wall.
