@@ -34,7 +34,12 @@ export default function Home() {
           >
             See a sample report →
           </Link>
-          <span className="text-[13px] text-ink-soft">Upload your own flow — coming in days</span>
+          <Link
+            href="/runs/new"
+            className="rounded-full border border-line bg-card px-5 py-2.5 text-[15px] font-medium transition-colors hover:border-ink-soft"
+          >
+            Test your own flow
+          </Link>
         </div>
       </section>
 
