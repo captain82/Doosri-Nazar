@@ -1,14 +1,34 @@
 import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 import ResultsView from "@/components/results-view";
 import { FAKE_REPORT } from "@/lib/fake-run";
+import { fetchRunReport } from "@/lib/queries";
+import { supabaseServer } from "@/lib/supabase/server";
+import type { RunReport } from "@/lib/types";
 
-export default function RunPage({
+export default async function RunPage({
+  params,
   searchParams,
 }: {
+  params: { id: string };
   searchParams: { view?: string };
 }) {
-  // route param becomes the fetch key once the real pipeline exists
-  const report = FAKE_REPORT;
+  const isDemo = params.id === "demo";
+  let report: RunReport;
+
+  if (isDemo) {
+    report = FAKE_REPORT;
+  } else {
+    const supabase = supabaseServer();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) redirect(`/login?next=/runs/${params.id}`);
+    const fetched = await fetchRunReport(supabase, params.id);
+    if (!fetched) notFound();
+    report = fetched;
+  }
+
   const initialView = searchParams.view === "screen" ? "screen" : "user";
 
   return (
@@ -18,9 +38,15 @@ export default function RunPage({
           <Link href="/" className="font-display text-lg font-semibold tracking-tight">
             Doosri Nazar <span className="ml-1 text-sm font-normal text-ink-soft">दूसरी नज़र</span>
           </Link>
-          <span className="rounded-full border border-line px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-ink-soft">
-            Sample report
-          </span>
+          {isDemo ? (
+            <span className="rounded-full border border-line px-2.5 py-1 text-[11px] font-medium uppercase tracking-wider text-ink-soft">
+              Sample report
+            </span>
+          ) : (
+            <Link href="/runs/new" className="text-[13px] text-ink-soft hover:text-ink">
+              New run
+            </Link>
+          )}
         </div>
       </nav>
       <ResultsView report={report} initialView={initialView} />

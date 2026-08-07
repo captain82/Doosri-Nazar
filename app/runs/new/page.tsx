@@ -1,7 +1,16 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import NewRunForm from "@/components/new-run-form";
+import UserChip from "@/components/user-chip";
+import { supabaseServer } from "@/lib/supabase/server";
 
-export default function NewRunPage() {
+export default async function NewRunPage() {
+  const supabase = supabaseServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/runs/new");
+
   return (
     <main>
       <nav className="border-b border-line">
@@ -9,9 +18,12 @@ export default function NewRunPage() {
           <Link href="/" className="font-display text-lg font-semibold tracking-tight">
             Doosri Nazar <span className="ml-1 text-sm font-normal text-ink-soft">दूसरी नज़र</span>
           </Link>
-          <Link href="/runs/demo" className="text-[13px] text-ink-soft hover:text-ink">
-            Sample report
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/runs/demo" className="text-[13px] text-ink-soft hover:text-ink">
+              Sample report
+            </Link>
+            <UserChip email={user.email ?? ""} />
+          </div>
         </div>
       </nav>
 
