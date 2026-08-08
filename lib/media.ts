@@ -30,6 +30,11 @@ async function downscale(buf: Buffer): Promise<string> {
   return out.toString("base64");
 }
 
+// Downscale an in-memory image buffer (e.g. an upload not yet in storage).
+export async function imageFromBuffer(buf: Buffer): Promise<AiImage> {
+  return { base64: await downscale(buf), mediaType: "image/jpeg" };
+}
+
 // Download a private screenshot, downscale it, and return a provider-neutral
 // image. Cached per path within one request so a screen re-sent across turns
 // isn't re-downloaded or re-encoded.

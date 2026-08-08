@@ -19,9 +19,9 @@ export async function POST(request: Request) {
   const files = form.getAll("screens").filter((f): f is File => f instanceof File);
   const labels = form.getAll("labels").map(String);
 
-  if (!files.length || !description) {
+  if (!files.length) {
     return NextResponse.json(
-      { error: "At least one screenshot and a description are required." },
+      { error: "Add at least one screenshot." },
       { status: 400 },
     );
   }
