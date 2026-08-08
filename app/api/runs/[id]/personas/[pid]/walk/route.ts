@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { MessageParam, TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { supabaseServer } from "@/lib/supabase/server";
-import { loadSeconds } from "@/lib/anthropic";
+import { loadSeconds, MODEL_WALK } from "@/lib/anthropic";
 import { WALK_SYSTEM, STEP_SCHEMA, walkPersonaHeader, walkScreenText } from "@/lib/prompts";
 import { imageBlock, jsonCall } from "@/lib/walk";
 import type { StepStatus } from "@/lib/types";
@@ -81,7 +81,12 @@ export async function POST(
         ],
       });
 
-      const step = await jsonCall<StepResult>({ system, messages, schema: STEP_SCHEMA });
+      const step = await jsonCall<StepResult>({
+        model: MODEL_WALK,
+        system,
+        messages,
+        schema: STEP_SCHEMA,
+      });
 
       // carry forward what the persona did, so confusion accumulates
       messages.push({ role: "assistant", content: JSON.stringify(step) });

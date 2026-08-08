@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
 import sharp from "sharp";
-import { anthropic, MODEL } from "./anthropic";
+import { anthropic } from "./anthropic";
 
 // Downscale a screenshot for the model: long edge to 1200px, JPEG q78. A phone
 // screenshot (1080×2280) otherwise hits the high-res vision tier at ~4k tokens;
@@ -37,17 +37,19 @@ export async function imageBlock(
 // One structured-JSON call with thinking off, schema-forced output, and one
 // retry if the model somehow returns unparseable JSON.
 export async function jsonCall<T>({
+  model,
   system,
   messages,
   schema,
 }: {
+  model: string;
   system: Anthropic.TextBlockParam[];
   messages: Anthropic.MessageParam[];
   schema: object;
 }): Promise<T> {
   for (let attempt = 0; attempt < 2; attempt++) {
     const res = await anthropic.messages.create({
-      model: MODEL,
+      model,
       max_tokens: 1500,
       thinking: { type: "disabled" },
       system,

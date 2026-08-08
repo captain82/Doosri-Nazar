@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { supabaseServer } from "@/lib/supabase/server";
+import { MODEL_PERSONA } from "@/lib/anthropic";
 import { PERSONA_SYSTEM, PERSONA_SCHEMA, personaUserText } from "@/lib/prompts";
 import { imageBlock, jsonCall } from "@/lib/walk";
 
@@ -48,6 +49,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
     ];
 
     const { personas } = await jsonCall<{ personas: GeneratedPersona[] }>({
+      model: MODEL_PERSONA,
       system,
       schema: PERSONA_SCHEMA,
       messages: [

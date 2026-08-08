@@ -2,10 +2,19 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export const anthropic = new Anthropic();
 
-// Sonnet 5: near-Opus reasoning (needed to avoid generic findings), high-res
-// vision, and intro pricing ($2/$10 per MTok through 2026-08-31). Thinking is
-// disabled and JSON is forced via structured outputs for speed + cost.
-export const MODEL = "claude-sonnet-5";
+// Per-call model split — the two calls have different requirements:
+//
+// Persona generation runs ONCE per run and is the quality seed (specific,
+// grounded people vs. archetypes), so it stays on Sonnet 5 — near-Opus
+// reasoning, at intro pricing $2/$10 per MTok through 2026-08-31.
+//
+// The walkthrough is ~90% of the calls and the dominant cost. A/B on real
+// screenshots showed Haiku 4.5 reaches the same findings (same friction/drop
+// verdicts, same specific constraints named) at ~3× lower cost, so the
+// cost-dominant bucket runs on Haiku. Both use thinking-off + structured
+// outputs for speed and valid JSON.
+export const MODEL_PERSONA = "claude-sonnet-5";
+export const MODEL_WALK = "claude-haiku-4-5";
 
 // Connection throughput in bytes/second, from the spec. Load time is COMPUTED
 // from real screenshot bytes and passed into the prompt as a fact — never
