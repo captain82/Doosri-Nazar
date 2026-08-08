@@ -30,30 +30,33 @@ export const LENS_POOL: string[] = [
   `PAST FAILED ATTEMPT: tried a similar app before and it charged them, failed, or never showed a result — approaches this one with specific learned distrust and looks for proof it will actually work.`,
 ];
 
-// Shuffle (Fisher–Yates) and take a subset. Server-side only — Math.random is
-// fine here (unlike workflow scripts).
-function sampleLenses(pool: string[], n: number): string[] {
+// Shuffle (Fisher–Yates) — server-side only, Math.random is fine here. We
+// shuffle the presentation order so the model isn't biased by list position,
+// but present the WHOLE library so it can pick what actually fits this product.
+function shuffled(pool: string[]): string[] {
   const a = [...pool];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
-  return a.slice(0, n);
+  return a;
 }
 
-// Built fresh per run so the sampled lens mix (and therefore the kinds of
-// people) varies from run to run.
+// Built fresh per run. The model sees the uploaded first screen + description
+// in the same call, so it SELECTS the lenses most relevant to THIS product
+// (a payments flow stresses money/trust; a govt form stresses identity/agent
+// use; a telehealth flow stresses privacy/urgency) rather than a random mix.
 export function personaSystem(): string {
-  const lenses = sampleLenses(LENS_POOL, 7);
+  const lenses = shuffled(LENS_POOL);
   return `You generate five test users for a product-design tool focused on NON-URBAN and small-town India. The single most important rule: these five must be five genuinely DIFFERENT HUMANS who fail — or succeed — for five DIFFERENT reasons. If your five people would give the same feedback in a different accent, you have failed. In particular, do NOT make everyone "a poor rural person who can't read English" — that is one archetype, not five people, and it makes every finding identical.
 
-Real non-urban India is not one archetype. Same screen — completely different experience depending on who is holding the phone.
+Below is a library of real ways non-urban Indian users get tripped up. SELECT the lenses most likely to expose real failures in THIS SPECIFIC product — you can see its first screen and you are told what it does, so choose accordingly. A payments or booking flow most stresses money, trust/scam, and payment-fear lenses; a government form most stresses identity/KYC mismatch, agent-mediated use, and document/jargon literacy; a health or telemedicine flow most stresses privacy, urgency/pain, and collective-decision lenses. Ignore lenses that clearly don't apply to this product. When several fit equally well, vary your choice.
 
-Give each of the five a DIFFERENT DOMINANT LENS: the one thing that most shapes how they experience THIS product. Assign each persona a different lens drawn from the families below (never give two people the same family), and make at MOST TWO people primarily about language/literacy:
+Give each of the five a DIFFERENT DOMINANT LENS chosen from this library (never give two people the same family), and make at MOST TWO people primarily about language/literacy:
 
 ${lenses.map((l) => `- ${l}`).join("\n")}
 
-If none of the above fits a genuinely real non-urban Indian user better, you may use one lens of your own — but it must be just as specific and just as different from the others.
+If a genuinely real non-urban Indian user of THIS product would be shaped by something not in the library, you may use one lens of your own — as specific and as distinct as these.
 
 Spread the material BACKDROP across the five too, but treat it as backdrop, not the point: connection from "5G"/"4G"/"Weak 4G"/"Throttled" with at least two on degraded speed; device from new to old/shared/first-smartphone; and include at least ONE proxy user operating the app for someone else. Use connection values EXACTLY from: "5G", "4G", "Weak 4G", "Throttled".
 
