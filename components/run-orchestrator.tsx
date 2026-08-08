@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ResultsView from "@/components/results-view";
 import type { Persona, RunReport } from "@/lib/types";
 
-type Phase = "personas" | "walking" | "done" | "error";
+type Phase = "personas" | "review" | "walking" | "done" | "error";
 
 const TONES = [
   "bg-terra-tint text-terra-deep",
@@ -29,65 +29,84 @@ async function readBody(res: Response): Promise<Record<string, unknown>> {
   }
 }
 
+function outcomeBadge(p: Persona) {
+  if (p.outcome === "dropped")
+    return { label: `Left at screen ${p.dropped_at_screen}`, cls: "bg-bad-tint text-bad" };
+  if (p.outcome === "struggled")
+    return { label: "Finished, struggled", cls: "bg-warn-tint text-warn" };
+  return { label: "Completed", cls: "bg-ok-tint text-ok" };
+}
+
 export default function RunOrchestrator({ initial }: { initial: RunReport }) {
   const router = useRouter();
   const [personas, setPersonas] = useState<Persona[]>(initial.personas);
-  const [phase, setPhase] = useState<Phase>(
-    initial.personas.length ? "walking" : "personas",
-  );
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (initial.personas.length === 0) return "personas";
+    // Personas already exist: resume walking if any are done, else wait for the
+    // user to kick off the walkthrough.
+    return initial.personas.some(isComplete) ? "walking" : "review";
+  });
   const [error, setError] = useState<string | null>(null);
-  const started = useRef(false);
+  const genStarted = useRef(false);
+  const walkStarted = useRef(false);
 
+  // Generate personas once, if we don't have them yet.
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-
+    if (phase !== "personas" || genStarted.current) return;
+    genStarted.current = true;
     (async () => {
       try {
-        let roster = initial.personas;
-
-        if (roster.length === 0) {
-          const res = await fetch(`/api/runs/${initial.id}/personas`, { method: "POST" });
-          const body = await readBody(res);
-          if (!res.ok) {
-            throw new Error(
-              typeof body.error === "string"
-                ? body.error
-                : "Generating users timed out. Please try running it again.",
-            );
-          }
-          roster = ((body.personas ?? []) as Persona[]).map((p) => ({ ...p, steps: [] }));
-          setPersonas(roster);
+        const res = await fetch(`/api/runs/${initial.id}/personas`, { method: "POST" });
+        const body = await readBody(res);
+        if (!res.ok) {
+          throw new Error(
+            typeof body.error === "string"
+              ? body.error
+              : "Generating users timed out. Please try running it again.",
+          );
         }
-
-        setPhase("walking");
-
-        // Fire all walks at once; render each persona's card as its walk lands.
-        await Promise.all(
-          roster.map(async (p) => {
-            if (isComplete(p)) return;
-            try {
-              const res = await fetch(`/api/runs/${initial.id}/personas/${p.id}/walk`, {
-                method: "POST",
-              });
-              const body = await readBody(res);
-              const walked: Persona = (body.persona as Persona) ?? p;
-              setPersonas((prev) => prev.map((x) => (x.id === p.id ? { ...x, ...walked } : x)));
-            } catch {
-              /* individual failure: leave the card as-is */
-            }
-          }),
-        );
-
-        await fetch(`/api/runs/${initial.id}/finish`, { method: "POST" });
-        setPhase("done");
-        router.refresh();
+        const roster = ((body.personas ?? []) as Persona[]).map((p) => ({ ...p, steps: [] }));
+        setPersonas(roster);
+        setPhase("review");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong.");
         setPhase("error");
       }
     })();
-  }, [initial, router]);
+  }, [phase, initial.id]);
+
+  // Walk the personas — kicked off by the button, or auto-resumed on reload.
+  const startWalking = () => {
+    if (walkStarted.current) return;
+    walkStarted.current = true;
+    setPhase("walking");
+    (async () => {
+      await Promise.all(
+        personas.map(async (p) => {
+          if (isComplete(p)) return;
+          try {
+            const res = await fetch(`/api/runs/${initial.id}/personas/${p.id}/walk`, {
+              method: "POST",
+            });
+            const body = await readBody(res);
+            const walked: Persona = (body.persona as Persona) ?? p;
+            setPersonas((prev) => prev.map((x) => (x.id === p.id ? { ...x, ...walked } : x)));
+          } catch {
+            /* individual failure: leave the card as-is */
+          }
+        }),
+      );
+      await fetch(`/api/runs/${initial.id}/finish`, { method: "POST" });
+      setPhase("done");
+      router.refresh();
+    })();
+  };
+
+  // Auto-resume if we loaded into a half-finished walk.
+  useEffect(() => {
+    if (phase === "walking" && !walkStarted.current) startWalking();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   if (phase === "done") {
     return <ResultsView report={{ ...initial, status: "done", personas }} />;
@@ -99,8 +118,14 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
     <div className="mx-auto w-full max-w-3xl px-4 pb-24 sm:px-6">
       <header className="pb-6 pt-10 sm:pt-14">
         <p className="mb-2 flex items-center gap-2 font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-terra">
-          <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
-          {phase === "personas" ? "Assembling your users" : "Walking them through"}
+          {phase !== "review" && (
+            <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
+          )}
+          {phase === "personas"
+            ? "Assembling your users"
+            : phase === "review"
+              ? "Your five testers"
+              : "Walking them through"}
         </p>
         <h1 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
           {initial.title}
@@ -108,13 +133,31 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
           {phase === "personas"
             ? "Generating five non-urban Indian users grounded in language, device, connection and prior experience…"
-            : `${doneCount} of ${personas.length} have finished walking through your ${initial.screens.length} screens. Each appears the moment they're done.`}
+            : phase === "review"
+              ? "These are the people who'll walk your flow — each shaped by a different real constraint. Review them, then send them through your screens."
+              : `${doneCount} of ${personas.length} have finished walking through your ${initial.screens.length} screens. Each appears the moment they're done.`}
         </p>
       </header>
 
       {error && (
         <div className="mb-6 rounded-lg border border-bad/30 bg-bad-tint px-4 py-3 text-[14px]">
           {error}
+        </div>
+      )}
+
+      {/* Walk button — top of the review step so it's obvious */}
+      {phase === "review" && (
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <button
+            onClick={startWalking}
+            className="rounded-full bg-ink px-5 py-2.5 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep"
+          >
+            Walk them through your {initial.screens.length} screen
+            {initial.screens.length > 1 ? "s" : ""} →
+          </button>
+          <span className="text-[13px] text-ink-soft">
+            Five walkthroughs, one per user — takes about a minute.
+          </span>
         </div>
       )}
 
@@ -127,16 +170,21 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
               style={{ animationDelay: `${i * 90}ms` }}
             >
               <span className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-paper-deep" />
-              <span className="h-3 w-40 animate-pulse rounded bg-paper-deep" />
+              <span className="flex-1 space-y-1.5">
+                <span className="block h-3 w-40 animate-pulse rounded bg-paper-deep" />
+                <span className="block h-2.5 w-full max-w-md animate-pulse rounded bg-paper-deep/70" />
+              </span>
             </div>
           ))}
 
         {personas.map((p, i) => {
           const complete = isComplete(p);
+          const review = phase === "review";
+          const badge = complete ? outcomeBadge(p) : null;
           return (
             <div
               key={p.id}
-              className="rise flex items-center gap-3 rounded-lg border border-line bg-card px-4 py-3.5 sm:gap-4 sm:px-5"
+              className="rise flex items-start gap-3 rounded-lg border border-line bg-card px-4 py-3.5 sm:gap-4 sm:px-5"
               style={{ animationDelay: `${i * 90}ms` }}
             >
               <span
@@ -145,39 +193,43 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
                 {p.initials}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-medium">
+                <span className="block font-medium">
                   {p.name} <span className="text-ink-soft">{p.age}</span>
                 </span>
-                <span className="block truncate text-[13px] text-ink-soft">
-                  {p.language} · {p.connection} · {p.context.split("·")[0].trim()}
+                <span className="block text-[12px] uppercase tracking-wider text-ink-soft">
+                  {p.language} · {p.connection} · {p.device}
+                </span>
+                {/* In review, show the full lens; while walking, keep it tight. */}
+                <span
+                  className={`mt-1 block text-[13px] leading-relaxed text-ink-soft ${review ? "" : "truncate"}`}
+                >
+                  {review ? p.context : p.context.split("·")[0].trim()}
                 </span>
               </span>
-              {complete ? (
-                <span
-                  className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                    p.outcome === "dropped"
-                      ? "bg-bad-tint text-bad"
-                      : p.outcome === "struggled"
-                        ? "bg-warn-tint text-warn"
-                        : "bg-ok-tint text-ok"
-                  }`}
-                >
-                  {p.outcome === "dropped"
-                    ? `Left at screen ${p.dropped_at_screen}`
-                    : p.outcome === "struggled"
-                      ? "Finished, struggled"
-                      : "Completed"}
+              {badge ? (
+                <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${badge.cls}`}>
+                  {badge.label}
                 </span>
-              ) : (
-                <span className="flex shrink-0 items-center gap-1.5 text-xs text-ink-soft">
+              ) : phase === "walking" ? (
+                <span className="flex shrink-0 items-center gap-1.5 pt-0.5 text-xs text-ink-soft">
                   <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
                   walking…
                 </span>
-              )}
+              ) : null}
             </div>
           );
         })}
       </div>
+
+      {/* Repeat the button at the bottom for long persona lists */}
+      {phase === "review" && personas.length > 0 && (
+        <button
+          onClick={startWalking}
+          className="mt-6 rounded-full bg-ink px-5 py-2.5 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep"
+        >
+          Walk them through →
+        </button>
+      )}
     </div>
   );
 }
