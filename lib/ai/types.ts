@@ -27,8 +27,22 @@ export interface GenerateJSONArgs {
   maxTokens?: number;
 }
 
+export interface ChatTurn {
+  role: "user" | "assistant";
+  text: string;
+}
+
+export interface StreamTextArgs {
+  model: string;
+  system: string;
+  messages: ChatTurn[];
+  maxTokens?: number;
+}
+
 export interface AiProvider {
   readonly name: string;
   // Returns validated JSON matching `schema`, retrying once on unparseable output.
   generateJSON<T>(args: GenerateJSONArgs): Promise<T>;
+  // Streams a free-text answer token by token (for the report chat).
+  streamText(args: StreamTextArgs): AsyncIterable<string>;
 }

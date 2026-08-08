@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import type { AiMessage, AiProvider, GenerateJSONArgs } from "./types";
+import type { AiMessage, AiProvider, GenerateJSONArgs, StreamTextArgs } from "./types";
 
 // Lazy client so importing this module doesn't throw when OPENAI_API_KEY is
 // unset (e.g. while Anthropic is the active provider).
@@ -72,5 +72,21 @@ export const openaiProvider: AiProvider = {
       }
     }
     throw new Error("OpenAI did not return valid JSON after one retry");
+  },
+
+  async *streamText({ model, system, messages, maxTokens = 1024 }: StreamTextArgs) {
+    const stream = await getClient().chat.completions.create({
+      model,
+      max_completion_tokens: maxTokens,
+      stream: true,
+      messages: [
+        { role: "system", content: system },
+        ...messages.map((m) => ({ role: m.role, content: m.text })),
+      ],
+    });
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) yield delta;
+    }
   },
 };

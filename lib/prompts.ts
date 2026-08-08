@@ -1,3 +1,5 @@
+import type { RunReport } from "./types";
+
 // The two prompts are where product quality lives. They name the persona's
 // specific constraints every turn and ask what those constraints COST — that's
 // what produces field-report findings instead of accessibility-checklist items.
@@ -89,6 +91,44 @@ export const INFER_SCHEMA = {
 } as const;
 
 export const INFER_USER = "Here are the screens of the flow, in order. Infer its title, category, and description.";
+
+// ── Report chat ─────────────────────────────────────────────────────
+
+export const CHAT_SYSTEM = `You are a sharp product-design advisor helping a designer act on a user-testing report. The product was tested against AI users grounded in non-urban India. The full report is given below.
+
+Answer the designer's questions grounded in THIS report — cite the specific people, screens, and findings by name. Be concrete and practical: prioritise by impact, propose specific copy/UI changes, and draft tickets when asked. Keep answers tight and skimmable — short paragraphs or bullets, no filler. If a question goes beyond what the report shows, answer with your best design judgement but flag clearly what is inference rather than evidence from the test. Never invent findings that aren't in the report.`;
+
+// A compact text digest of the report, used as grounding for the chat.
+export function reportContext(r: RunReport): string {
+  const reached = r.personas.filter((p) => p.outcome !== "dropped").length;
+  const lines: string[] = [];
+  lines.push(`FLOW: ${r.title}`);
+  if (r.description) lines.push(`WHAT IT DOES: ${r.description}`);
+  lines.push(
+    `SCREENS (in order): ${r.screens.map((s) => `${s.position}. ${s.label || "(unlabeled)"}`).join("  ")}`,
+  );
+  lines.push(`RESULT: ${reached} of ${r.personas.length} reached the end.`);
+  for (const p of r.personas) {
+    lines.push(
+      `\nUSER — ${p.name}, ${p.age}, ${p.language}, ${p.connection}, ${p.device}. Lens: ${p.context}. Outcome: ${p.outcome}${p.dropped_at_screen ? ` (left at screen ${p.dropped_at_screen})` : ""}.`,
+    );
+    for (const s of p.steps) {
+      const screen = r.screens.find((sc) => sc.id === s.screen_id);
+      const load = s.metrics?.load_seconds != null ? ` [${s.metrics.load_seconds}s load]` : "";
+      lines.push(
+        `  • ${screen?.label || `screen ${s.position}`} (${s.status})${load}: ${s.narrative}${s.suggestion ? `  FIX: ${s.suggestion}` : ""}`,
+      );
+    }
+  }
+  return lines.join("\n");
+}
+
+export const CHAT_STARTERS: { label: string; prompt: string }[] = [
+  { label: "What to fix first", prompt: "What should I fix first? Prioritise the issues by impact and rough effort, most important first." },
+  { label: "Why did users drop?", prompt: "Why did users drop off? Summarise each drop-off and the pattern across them." },
+  { label: "Draft tickets", prompt: "Draft short engineering tickets for the top issues — one per ticket, each with a title and a one-line description." },
+  { label: "Group by theme", prompt: "Group all the problems into a few clear themes and name the biggest one." },
+];
 
 export function personaUserText(description: string): string {
   return `Feature description:\n${description}\n\nThe attached image is the FIRST screen a user sees. Generate the five people who will now walk through this flow.`;

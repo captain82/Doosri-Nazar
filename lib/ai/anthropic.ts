@@ -4,7 +4,7 @@ import type {
   MessageParam,
   TextBlockParam,
 } from "@anthropic-ai/sdk/resources/messages";
-import type { AiMessage, AiProvider, GenerateJSONArgs } from "./types";
+import type { AiMessage, AiProvider, GenerateJSONArgs, StreamTextArgs } from "./types";
 
 // 55s per-request timeout + one retry so a stalled serverless connection aborts
 // and recovers instead of hanging until the platform kills the function.
@@ -73,5 +73,20 @@ export const anthropicProvider: AiProvider = {
       }
     }
     throw new Error("Anthropic did not return valid JSON after one retry");
+  },
+
+  async *streamText({ model, system, messages, maxTokens = 1024 }: StreamTextArgs) {
+    const stream = getClient().messages.stream({
+      model,
+      max_tokens: maxTokens,
+      thinking: { type: "disabled" },
+      system,
+      messages: messages.map((m) => ({ role: m.role, content: m.text })),
+    });
+    for await (const event of stream) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        yield event.delta.text;
+      }
+    }
   },
 };

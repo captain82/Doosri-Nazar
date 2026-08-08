@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import ChatPanel from "@/components/chat-panel";
 import type { Persona, RunReport, Screen, Step, StepStatus } from "@/lib/types";
 
 const AVATAR_TONES = [
@@ -341,6 +342,8 @@ export default function ResultsView({
           ))}
         </div>
       )}
+
+      <ChatPanel runId={report.id} />
     </div>
   );
 }
