@@ -1,10 +1,24 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import Anthropic from "@anthropic-ai/sdk";
-import { anthropic, MODEL, mediaTypeFor } from "./anthropic";
+import sharp from "sharp";
+import { anthropic, MODEL } from "./anthropic";
 
-// Download a private screenshot from storage and return it as a base64 image
-// block, ready to drop into a message. Cached per path within one request so a
-// screen re-sent across turns isn't re-downloaded.
+// Downscale a screenshot for the model: long edge to 1200px, JPEG q78. A phone
+// screenshot (1080×2280) otherwise hits the high-res vision tier at ~4k tokens;
+// this keeps UI detail legible while cutting image tokens ~60-70%. The ORIGINAL
+// file stays in storage — load-time math uses its bytes, not this copy.
+async function downscale(buf: Buffer): Promise<string> {
+  const out = await sharp(buf)
+    .rotate()
+    .resize(1200, 1200, { fit: "inside", withoutEnlargement: true })
+    .jpeg({ quality: 78 })
+    .toBuffer();
+  return out.toString("base64");
+}
+
+// Download a private screenshot, downscale it, and return a base64 image block.
+// Cached per path within one request so a screen re-sent across turns isn't
+// re-downloaded or re-encoded.
 export async function imageBlock(
   supabase: SupabaseClient,
   cache: Map<string, string>,
@@ -14,10 +28,10 @@ export async function imageBlock(
   if (!data) {
     const { data: blob, error } = await supabase.storage.from("screens").download(path);
     if (error || !blob) throw new Error(`could not read screen ${path}: ${error?.message}`);
-    data = Buffer.from(await blob.arrayBuffer()).toString("base64");
+    data = await downscale(Buffer.from(await blob.arrayBuffer()));
     cache.set(path, data);
   }
-  return { type: "image", source: { type: "base64", media_type: mediaTypeFor(path), data } };
+  return { type: "image", source: { type: "base64", media_type: "image/jpeg", data } };
 }
 
 // One structured-JSON call with thinking off, schema-forced output, and one
