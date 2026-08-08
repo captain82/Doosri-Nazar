@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import type { TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { supabaseServer } from "@/lib/supabase/server";
-import { MODEL_PERSONA } from "@/lib/anthropic";
+import { getProvider, PERSONA_MODEL } from "@/lib/ai";
+import type { AiMessage } from "@/lib/ai/types";
+import { imageData } from "@/lib/media";
 import { PERSONA_SYSTEM, PERSONA_SCHEMA, personaUserText } from "@/lib/prompts";
-import { imageBlock, jsonCall } from "@/lib/walk";
 
 export const maxDuration = 300;
 
@@ -44,25 +44,27 @@ export async function POST(_request: Request, { params }: { params: { id: string
 
   try {
     const t0 = Date.now();
-    const first = await imageBlock(supabase, new Map(), screens[0].storage_path);
+    const first = await imageData(supabase, new Map(), screens[0].storage_path);
     console.log(`[personas] image ready in ${Date.now() - t0}ms`);
-    const system: TextBlockParam[] = [
-      { type: "text", text: PERSONA_SYSTEM, cache_control: { type: "ephemeral" } },
+
+    const messages: AiMessage[] = [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: personaUserText(run.description) },
+          { type: "image", image: first },
+        ],
+      },
     ];
 
     const tModel = Date.now();
-    const { personas } = await jsonCall<{ personas: GeneratedPersona[] }>({
-      model: MODEL_PERSONA,
-      system,
+    const { personas } = await getProvider().generateJSON<{ personas: GeneratedPersona[] }>({
+      model: PERSONA_MODEL,
+      system: PERSONA_SYSTEM,
+      schemaName: "personas",
       schema: PERSONA_SCHEMA,
-      messages: [
-        {
-          role: "user",
-          content: [{ type: "text", text: personaUserText(run.description) }, first],
-        },
-      ],
+      messages,
     });
-
     console.log(`[personas] model returned ${personas?.length} in ${Date.now() - tModel}ms`);
 
     const rows = personas.slice(0, 5).map((p) => ({

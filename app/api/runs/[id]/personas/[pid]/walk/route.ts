@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import type { MessageParam, TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { supabaseServer } from "@/lib/supabase/server";
-import { loadSeconds, MODEL_WALK } from "@/lib/anthropic";
+import { getProvider, WALK_MODEL } from "@/lib/ai";
+import type { AiMessage } from "@/lib/ai/types";
+import { imageData, loadSeconds } from "@/lib/media";
 import { WALK_SYSTEM, STEP_SCHEMA, walkPersonaHeader, walkScreenText } from "@/lib/prompts";
-import { imageBlock, jsonCall } from "@/lib/walk";
 import type { StepStatus } from "@/lib/types";
 
 export const maxDuration = 300;
@@ -40,29 +40,22 @@ export async function POST(
     .order("position", { ascending: true });
   if (!screens?.length) return NextResponse.json({ error: "No screens." }, { status: 400 });
 
-  const system: TextBlockParam[] = [
-    { type: "text", text: WALK_SYSTEM, cache_control: { type: "ephemeral" } },
-    { type: "text", text: walkPersonaHeader(persona), cache_control: { type: "ephemeral" } },
-  ];
+  // Stable segment first (shared across all personas, cacheable), volatile
+  // persona header second.
+  const system = [WALK_SYSTEM, walkPersonaHeader(persona)];
 
   const imageCache = new Map<string, string>();
-  const messages: MessageParam[] = [];
+  const messages: AiMessage[] = [];
   const steps = [];
   let outcome: "completed" | "struggled" | "dropped" = "completed";
   let droppedAt: number | null = null;
   let sawFriction = false;
-  // The API caps cache_control at 4 breakpoints; system uses 2. So we keep a
-  // SINGLE moving breakpoint on the most-recent image — its prefix (all prior
-  // screens, already written to cache) is read, and it writes the new screen.
-  let prevImage: { cache_control?: unknown } | null = null;
+  const provider = getProvider();
 
   try {
     for (const screen of screens) {
       const secs = loadSeconds(screen.bytes, persona.connection);
-      const img = await imageBlock(supabase, imageCache, screen.storage_path);
-      if (prevImage) delete prevImage.cache_control;
-      const cachedImg = { ...img, cache_control: { type: "ephemeral" as const } };
-      prevImage = cachedImg;
+      const img = await imageData(supabase, imageCache, screen.storage_path);
 
       messages.push({
         role: "user",
@@ -77,19 +70,20 @@ export async function POST(
               connection: persona.connection,
             }),
           },
-          cachedImg,
+          { type: "image", image: img },
         ],
       });
 
-      const step = await jsonCall<StepResult>({
-        model: MODEL_WALK,
+      const step = await provider.generateJSON<StepResult>({
+        model: WALK_MODEL,
         system,
-        messages,
+        schemaName: "step",
         schema: STEP_SCHEMA,
+        messages,
       });
 
       // carry forward what the persona did, so confusion accumulates
-      messages.push({ role: "assistant", content: JSON.stringify(step) });
+      messages.push({ role: "assistant", content: [{ type: "text", text: JSON.stringify(step) }] });
 
       const { data: row } = await supabase
         .from("steps")

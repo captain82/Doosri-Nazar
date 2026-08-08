@@ -23,7 +23,30 @@ This is not a replacement for going to a village and watching someone use your a
 
 ## Stack
 
-Next.js 14 (App Router, TypeScript) · Tailwind · Supabase (auth, DB, storage) · Anthropic Claude (vision) · Vercel
+Next.js 14 (App Router, TypeScript) · Tailwind · Supabase (auth, DB, storage) · pluggable LLM provider (Anthropic Claude / OpenAI) · Vercel
+
+## Switching the AI provider
+
+The two model calls (persona generation, walkthrough) go through a
+provider-neutral interface in `lib/ai/`. Swap vendors with environment
+variables — no code change:
+
+| Var | Default | Notes |
+|---|---|---|
+| `AI_PROVIDER` | `anthropic` | `anthropic` or `openai` |
+| `PERSONA_MODEL` | per-provider | override the persona-generation model |
+| `WALK_MODEL` | per-provider | override the walkthrough model |
+| `ANTHROPIC_API_KEY` | — | required when `AI_PROVIDER=anthropic` |
+| `OPENAI_API_KEY` | — | required when `AI_PROVIDER=openai` |
+
+Per-provider default models:
+
+- **anthropic** — persona `claude-sonnet-5`, walk `claude-haiku-4-5`
+- **openai** — persona `gpt-4o`, walk `gpt-4o-mini`
+
+To run OpenAI: set `OPENAI_API_KEY`, then `AI_PROVIDER=openai`
+(`vercel env add …` for production). Both providers use structured-output JSON
+and image (vision) input; adding a third provider is one file in `lib/ai/`.
 
 ## Run it locally
 
