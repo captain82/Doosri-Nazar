@@ -17,6 +17,18 @@ const TONES = [
 
 const isComplete = (p: Persona) => p.outcome != null && p.steps?.length > 0;
 
+// Read a response safely — a platform-level error (timeout, crash) returns a
+// plain-text body, so JSON.parse would throw the cryptic "Unexpected token"
+// error. Fall back to the raw text as a message instead.
+async function readBody(res: Response): Promise<Record<string, unknown>> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { error: text.slice(0, 200) || `Request failed (${res.status}).` };
+  }
+}
+
 export default function RunOrchestrator({ initial }: { initial: RunReport }) {
   const router = useRouter();
   const [personas, setPersonas] = useState<Persona[]>(initial.personas);
@@ -36,9 +48,15 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
 
         if (roster.length === 0) {
           const res = await fetch(`/api/runs/${initial.id}/personas`, { method: "POST" });
-          const body = await res.json();
-          if (!res.ok) throw new Error(body.error ?? "Could not generate users.");
-          roster = (body.personas as Persona[]).map((p) => ({ ...p, steps: [] }));
+          const body = await readBody(res);
+          if (!res.ok) {
+            throw new Error(
+              typeof body.error === "string"
+                ? body.error
+                : "Generating users timed out. Please try running it again.",
+            );
+          }
+          roster = ((body.personas ?? []) as Persona[]).map((p) => ({ ...p, steps: [] }));
           setPersonas(roster);
         }
 
@@ -52,8 +70,8 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
               const res = await fetch(`/api/runs/${initial.id}/personas/${p.id}/walk`, {
                 method: "POST",
               });
-              const body = await res.json();
-              const walked: Persona = body.persona ?? p;
+              const body = await readBody(res);
+              const walked: Persona = (body.persona as Persona) ?? p;
               setPersonas((prev) => prev.map((x) => (x.id === p.id ? { ...x, ...walked } : x)));
             } catch {
               /* individual failure: leave the card as-is */

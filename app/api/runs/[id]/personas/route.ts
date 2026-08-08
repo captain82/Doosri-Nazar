@@ -5,7 +5,7 @@ import { MODEL_PERSONA } from "@/lib/anthropic";
 import { PERSONA_SYSTEM, PERSONA_SCHEMA, personaUserText } from "@/lib/prompts";
 import { imageBlock, jsonCall } from "@/lib/walk";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 interface GeneratedPersona {
   name: string;
@@ -43,11 +43,14 @@ export async function POST(_request: Request, { params }: { params: { id: string
   await supabase.from("runs").update({ status: "generating" }).eq("id", run.id);
 
   try {
+    const t0 = Date.now();
     const first = await imageBlock(supabase, new Map(), screens[0].storage_path);
+    console.log(`[personas] image ready in ${Date.now() - t0}ms`);
     const system: TextBlockParam[] = [
       { type: "text", text: PERSONA_SYSTEM, cache_control: { type: "ephemeral" } },
     ];
 
+    const tModel = Date.now();
     const { personas } = await jsonCall<{ personas: GeneratedPersona[] }>({
       model: MODEL_PERSONA,
       system,
@@ -59,6 +62,8 @@ export async function POST(_request: Request, { params }: { params: { id: string
         },
       ],
     });
+
+    console.log(`[personas] model returned ${personas?.length} in ${Date.now() - tModel}ms`);
 
     const rows = personas.slice(0, 5).map((p) => ({
       run_id: run.id,

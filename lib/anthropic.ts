@@ -1,6 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-export const anthropic = new Anthropic();
+// Per-request timeout + one retry: on a serverless platform a stalled
+// connection would otherwise hang the whole function until the platform kills
+// it (returning a non-JSON error page). A 55s timeout lets a stall abort and
+// retry within the function's budget, surfacing as a handled JSON error if it
+// still fails.
+export const anthropic = new Anthropic({ timeout: 55_000, maxRetries: 1 });
 
 // Per-call model split — the two calls have different requirements:
 //

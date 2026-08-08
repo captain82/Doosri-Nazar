@@ -6,7 +6,7 @@ import { WALK_SYSTEM, STEP_SCHEMA, walkPersonaHeader, walkScreenText } from "@/l
 import { imageBlock, jsonCall } from "@/lib/walk";
 import type { StepStatus } from "@/lib/types";
 
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 interface StepResult {
   status: StepStatus;

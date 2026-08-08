@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { imageSize } from "image-size";
 import { supabaseServer } from "@/lib/supabase/server";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   const supabase = supabaseServer();
