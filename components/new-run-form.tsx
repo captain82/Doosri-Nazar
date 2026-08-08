@@ -12,6 +12,8 @@ interface Draft {
   height: number;
 }
 
+type Phase = "upload" | "reading" | "details";
+
 // Worst realistic case: a phone throttled after its data pack runs out (~64kbps).
 const loadThrottled = (bytes: number) => (bytes / 12000).toFixed(1);
 
@@ -21,8 +23,8 @@ export default function NewRunForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [inferring, setInferring] = useState(false);
   const [inferFailed, setInferFailed] = useState(false);
+  const [phase, setPhase] = useState<Phase>("upload");
   const [dragOver, setDragOver] = useState(false);
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -30,7 +32,7 @@ export default function NewRunForm() {
   const inputRef = useRef<HTMLInputElement>(null);
   const titleTouched = useRef(false);
   const descTouched = useRef(false);
-  const inferredFor = useRef<string | null>(null);
+  const readKey = useRef<string | null>(null);
 
   const addFiles = (list: FileList | null) => {
     if (!list) return;
@@ -55,37 +57,16 @@ export default function NewRunForm() {
       });
   };
 
-  // Paste a screenshot straight in (⌘V) — no file dialog.
+  // Paste a screenshot straight in (⌘V) while on the upload step.
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
+      if (phase !== "upload") return;
       const files = e.clipboardData?.files;
       if (files && files.length) addFiles(files);
     };
     window.addEventListener("paste", onPaste);
     return () => window.removeEventListener("paste", onPaste);
-  }, []);
-
-  // Read-it-back: when the first screen lands, infer title/category/description
-  // so the fields arrive prefilled. Never overwrites what the user has typed.
-  const firstId = screens[0]?.id;
-  useEffect(() => {
-    if (!firstId || inferredFor.current === firstId) return;
-    inferredFor.current = firstId;
-    const file = screens[0].file;
-    setInferring(true);
-    setInferFailed(false);
-    const fd = new FormData();
-    fd.set("screen", file);
-    fetch("/api/infer", { method: "POST", body: fd })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => {
-        if (d.category) setCategory(d.category);
-        if (d.title && !titleTouched.current) setTitle(d.title);
-        if (d.description && !descTouched.current) setDescription(d.description);
-      })
-      .catch(() => setInferFailed(true))
-      .finally(() => setInferring(false));
-  }, [firstId, screens]);
+  }, [phase]);
 
   const move = (from: number, to: number) =>
     setScreens((prev) => {
@@ -101,6 +82,33 @@ export default function NewRunForm() {
       URL.revokeObjectURL(prev[idx].url);
       return prev.filter((_, i) => i !== idx);
     });
+
+  // Next → read all screens, prefill, then reveal the details step. Skips the
+  // read if the same set of screens was already read (e.g. after going Back).
+  const next = async () => {
+    const key = screens.map((s) => s.id).join(",");
+    if (readKey.current === key) {
+      setPhase("details");
+      return;
+    }
+    setPhase("reading");
+    setInferFailed(false);
+    try {
+      const fd = new FormData();
+      screens.forEach((s) => fd.append("screens", s.file));
+      const res = await fetch("/api/infer", { method: "POST", body: fd });
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      if (d.category) setCategory(d.category);
+      if (d.title && !titleTouched.current) setTitle(d.title);
+      if (d.description && !descTouched.current) setDescription(d.description);
+      readKey.current = key;
+    } catch {
+      setInferFailed(true);
+    } finally {
+      setPhase("details");
+    }
+  };
 
   const submit = async () => {
     setSubmitting(true);
@@ -128,12 +136,106 @@ export default function NewRunForm() {
     }
   };
 
-  const ready = screens.length > 0 && !submitting;
   const hasScreens = screens.length > 0;
 
+  // ── Reading (loader) ────────────────────────────────────────────────
+  if (phase === "reading") {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border border-line bg-card px-6 py-20 text-center">
+        <div className="flex gap-1.5" aria-hidden>
+          <span className="h-2 w-2 animate-bounce rounded-full bg-terra [animation-delay:-0.3s]" />
+          <span className="h-2 w-2 animate-bounce rounded-full bg-terra [animation-delay:-0.15s]" />
+          <span className="h-2 w-2 animate-bounce rounded-full bg-terra" />
+        </div>
+        <p className="mt-5 font-display text-lg font-semibold">Reading your screens…</p>
+        <p className="mt-1.5 max-w-sm text-[14px] text-ink-soft">
+          Understanding the flow so you don&apos;t have to describe it. This takes a few seconds.
+        </p>
+      </div>
+    );
+  }
+
+  // ── Details (filled-in, editable) ───────────────────────────────────
+  if (phase === "details") {
+    return (
+      <div className="space-y-6">
+        <button
+          onClick={() => setPhase("upload")}
+          className="text-[13px] text-ink-soft transition-colors hover:text-ink"
+        >
+          ← Back to screens ({screens.length})
+        </button>
+
+        <div className="flex items-center gap-2 text-[13px]">
+          {inferFailed ? (
+            <span className="text-ink-soft">
+              Couldn&apos;t auto-read the screens — add a name and description yourself, or just run it.
+            </span>
+          ) : category ? (
+            <span className="text-ink-soft">
+              We read your {screens.length} screen{screens.length > 1 ? "s" : ""}. Looks like{" "}
+              <span className="rounded-full border border-line bg-card px-2 py-0.5 font-medium text-ink">
+                {category}
+              </span>{" "}
+              — edit anything below, or just run it.
+            </span>
+          ) : null}
+        </div>
+
+        <div>
+          <label htmlFor="title" className="mb-1.5 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
+            Name this run
+          </label>
+          <input
+            id="title"
+            value={title}
+            onChange={(e) => {
+              titleTouched.current = true;
+              setTitle(e.target.value);
+            }}
+            placeholder="Give this run a name"
+            className="w-full rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="mb-1.5 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
+            What this flow does <span className="font-normal normal-case tracking-normal text-ink-soft">— optional</span>
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => {
+              descTouched.current = true;
+              setDescription(e.target.value);
+            }}
+            rows={4}
+            placeholder="We infer this from your screens — leave it or refine it."
+            className="w-full resize-y rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
+          />
+          <p className="mt-1.5 text-[12px] text-ink-soft">
+            Add anything we can&apos;t see — hidden rules, what happens after payment — to sharpen the report.
+          </p>
+        </div>
+
+        {notice && (
+          <div className="rounded-lg border border-warn/30 bg-warn-tint px-4 py-3 text-[14px]">{notice}</div>
+        )}
+
+        <button
+          onClick={submit}
+          disabled={submitting}
+          className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+        >
+          {submitting ? "Setting up the run…" : "Run it past five users →"}
+        </button>
+      </div>
+    );
+  }
+
+  // ── Upload (arrange all screens) ────────────────────────────────────
   return (
-    <div className="space-y-8">
-      {/* Screens — the one thing to do first */}
+    <div className="space-y-6">
       <section>
         <label className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
           Screens, in the order users see them
@@ -229,79 +331,16 @@ export default function NewRunForm() {
         )}
       </section>
 
-      {/* We read it back — only after screens are present */}
-      {hasScreens && (
-        <section className="space-y-4">
-          <div className="flex items-center gap-2 text-[13px]">
-            {inferring ? (
-              <>
-                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
-                <span className="text-ink-soft">Reading your screens…</span>
-              </>
-            ) : inferFailed ? (
-              <span className="text-ink-soft">
-                Couldn&apos;t auto-read the screens — add a name and description yourself, or just run it.
-              </span>
-            ) : category ? (
-              <span className="text-ink-soft">
-                We think this is{" "}
-                <span className="rounded-full border border-line bg-card px-2 py-0.5 font-medium text-ink">
-                  {category}
-                </span>{" "}
-                — edit anything below, or just run it.
-              </span>
-            ) : null}
-          </div>
-
-          <div>
-            <label htmlFor="title" className="mb-1.5 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-              Name this run
-            </label>
-            <input
-              id="title"
-              value={title}
-              onChange={(e) => {
-                titleTouched.current = true;
-                setTitle(e.target.value);
-              }}
-              placeholder={inferring ? "Reading your screens…" : "Give this run a name"}
-              className="w-full rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="mb-1.5 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-              What this flow does <span className="font-normal normal-case tracking-normal text-ink-soft">— optional</span>
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => {
-                descTouched.current = true;
-                setDescription(e.target.value);
-              }}
-              rows={3}
-              placeholder={inferring ? "Reading your screens…" : "We'll infer this from your screens — leave it or refine it."}
-              className="w-full resize-y rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
-            />
-            <p className="mt-1.5 text-[12px] text-ink-soft">
-              We read the screens ourselves. Add anything we can&apos;t see — hidden rules, what happens after payment — to sharpen the report.
-            </p>
-          </div>
-        </section>
-      )}
-
-      {notice && (
-        <div className="rounded-lg border border-warn/30 bg-warn-tint px-4 py-3 text-[14px]">{notice}</div>
-      )}
-
       <button
-        onClick={submit}
-        disabled={!ready}
+        onClick={next}
+        disabled={!hasScreens}
         className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
       >
-        {submitting ? "Setting up the run…" : "Run it past five users →"}
+        Next →
       </button>
+      {!hasScreens && (
+        <p className="text-[12px] text-ink-soft">Add your screenshots first, then we&apos;ll read them for you.</p>
+      )}
     </div>
   );
 }

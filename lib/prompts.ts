@@ -70,10 +70,10 @@ Return ONLY the required structured output. No preamble.`;
 // Read-it-back: infer a title, category, and draft description from the first
 // screen, so the upload form arrives prefilled instead of asking the user to
 // write everything.
-export const INFER_SYSTEM = `You are shown the FIRST screen of a mobile app flow. From this one screen, infer three things for a product-testing tool:
+export const INFER_SYSTEM = `You are shown the screens of a mobile app flow, in the order a user meets them. From these screens, infer three things for a product-testing tool:
 - title: a short, human name for this flow (e.g. "Sehat Sathi — doctor consultation booking"). If the app's own name is visible, use it; otherwise describe the flow.
 - category: the product category in 1-3 words (e.g. telemedicine, government scheme, e-commerce, banking, insurance, education, ride/delivery, utility bill, job/gig, travel).
-- description: 1-2 plain-English sentences on what this flow lets a user do and, if you can tell, the steps and any payment. Concrete, no fluff.
+- description: 2-3 plain-English sentences tracing what this flow lets a user do across the screens — the steps in order, and any payment or verification you can see. Concrete, no fluff.
 
 Give your best guess even when unsure. Return ONLY the structured output. No preamble.`;
 
@@ -88,7 +88,7 @@ export const INFER_SCHEMA = {
   required: ["title", "category", "description"],
 } as const;
 
-export const INFER_USER = "Here is the first screen of the flow. Infer its title, category, and description.";
+export const INFER_USER = "Here are the screens of the flow, in order. Infer its title, category, and description.";
 
 export function personaUserText(description: string): string {
   return `Feature description:\n${description}\n\nThe attached image is the FIRST screen a user sees. Generate the five people who will now walk through this flow.`;
