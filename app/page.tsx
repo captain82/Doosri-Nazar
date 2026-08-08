@@ -23,9 +23,9 @@ export default function Home() {
         <p className="rise mt-6 max-w-xl text-[16px] leading-relaxed text-ink-soft" style={{ animationDelay: "120ms" }}>
           Most software in India is designed and tested by people with new phones, fast internet
           and good English. Everyone else gets designed out — not deliberately, just invisibly.
-          Doosri Nazar walks AI users grounded in non-urban India — 2G connections, first
-          smartphones, five languages, borrowed phones — through your screens and shows you
-          exactly where they fall off.
+          Doosri Nazar walks AI users grounded in non-urban India — throttled data, shared
+          phones, first smartphones, five languages, no email address — through your screens and
+          shows you exactly where they fall off.
         </p>
         <div className="rise mt-8 flex flex-wrap items-center gap-4" style={{ animationDelay: "180ms" }}>
           <Link

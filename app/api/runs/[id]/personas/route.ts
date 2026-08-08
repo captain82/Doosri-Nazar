@@ -12,7 +12,7 @@ interface GeneratedPersona {
   age: number;
   language: string;
   device: string;
-  connection: "2G" | "3G" | "4G";
+  connection: "5G" | "4G" | "Weak 4G" | "Throttled";
   context: string;
   initials: string;
 }

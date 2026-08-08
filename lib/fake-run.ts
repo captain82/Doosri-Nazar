@@ -3,8 +3,8 @@ import type { RunReport } from "./types";
 // Hardcoded sample report. The results page reads this until the real
 // pipeline exists — swapping it for a fetch is a one-line change.
 //
-// load_seconds follows the real formula: bytes / 30000 (2G),
-// bytes / 120000 (3G), bytes / 400000 (4G).
+// load_seconds follows the real formula: bytes / throughput, where throughput
+// is 1.5MB/s (5G), 400KB/s (4G), 100KB/s (Weak 4G), 12KB/s (Throttled).
 
 export const FAKE_REPORT: RunReport = {
   id: "demo",
@@ -27,7 +27,7 @@ export const FAKE_REPORT: RunReport = {
       age: 46,
       language: "Bhojpuri, some Hindi",
       device: "Redmi 9A",
-      connection: "2G",
+      connection: "Throttled",
       context: "First smartphone in 2024 · reads Hindi slowly · has never paid online",
       initials: "RY",
       outcome: "dropped",
@@ -37,7 +37,7 @@ export const FAKE_REPORT: RunReport = {
           id: "p1-1", screen_id: "s1", position: 1, status: "friction",
           narrative:
             "The OTP arrived after the 30-second countdown had already expired. He tapped resend twice and got locked out for a minute, unsure if he had done something wrong.",
-          suggestion: "Give the OTP window 90 seconds and never punish resend — on 2G the SMS itself is the slow part.",
+          suggestion: "Give the OTP window 90 seconds and never punish resend — on a throttled connection the SMS itself is the slow part.",
           metrics: { load_seconds: 7.0 },
         },
         {
@@ -62,7 +62,7 @@ export const FAKE_REPORT: RunReport = {
       age: 58,
       language: "Telugu only",
       device: "Samsung J2 (son's old phone)",
-      connection: "2G",
+      connection: "Throttled",
       context: "Cannot read English · navigates by icons and colour · son usually helps",
       initials: "LN",
       outcome: "dropped",
@@ -90,7 +90,7 @@ export const FAKE_REPORT: RunReport = {
       age: 22,
       language: "Hindi + English",
       device: "Realme Narzo",
-      connection: "4G",
+      connection: "5G",
       context: "Booking for his grandfather 400 km away · operates every app for the family",
       initials: "AK",
       outcome: "dropped",
@@ -137,7 +137,7 @@ export const FAKE_REPORT: RunReport = {
       age: 33,
       language: "Urdu + Hindi",
       device: "Vivo Y12 (shared with wife)",
-      connection: "3G",
+      connection: "Weak 4G",
       context: "Gig driver · fluent in WhatsApp and YouTube · wary of online payments",
       initials: "FS",
       outcome: "struggled",
@@ -185,6 +185,7 @@ export const FAKE_REPORT: RunReport = {
       language: "Hindi + English",
       device: "OnePlus Nord",
       connection: "4G",
+      // (Priya stays on solid 4G — the comfortable end of the spread)
       context: "School teacher in a district town · comfortable online · books everything herself",
       initials: "PS",
       outcome: "completed",

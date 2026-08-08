@@ -36,7 +36,7 @@ function MetricTags({ step, persona }: { step: Step; persona: Persona }) {
   if (step.metrics.load_seconds == null) return null;
   return (
     <span className="inline-block rounded border border-line bg-paper px-1.5 py-0.5 text-[11px] tabular-nums text-ink-soft">
-      {step.metrics.load_seconds.toFixed(1)}s to load on {persona.connection}
+      {step.metrics.load_seconds.toFixed(1)}s to load · {persona.connection}
     </span>
   );
 }

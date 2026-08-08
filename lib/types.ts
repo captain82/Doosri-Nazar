@@ -1,7 +1,7 @@
 export type RunStatus = "pending" | "generating" | "walking" | "done" | "error";
 export type Outcome = "completed" | "struggled" | "dropped";
 export type StepStatus = "ok" | "friction" | "dropped";
-export type Connection = "2G" | "3G" | "4G";
+export type Connection = "5G" | "4G" | "Weak 4G" | "Throttled";
 
 export interface Screen {
   id: string;

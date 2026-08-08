@@ -28,7 +28,7 @@ create table public.personas (
   age int not null,
   language text not null,
   device text not null,
-  connection text not null check (connection in ('2G', '3G', '4G')),
+  connection text not null, -- "5G" | "4G" | "Weak 4G" | "Throttled" (kept as free text so labels can evolve)
   context text not null,
   initials text not null,
   outcome text check (outcome in ('completed', 'struggled', 'dropped')),

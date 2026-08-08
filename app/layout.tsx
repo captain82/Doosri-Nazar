@@ -17,7 +17,7 @@ const plex = IBM_Plex_Sans({
 export const metadata: Metadata = {
   title: "Doosri Nazar — test your design against the other India",
   description:
-    "Upload a flow, and AI users grounded in non-urban India — 2G connections, first smartphones, five languages — walk through it and tell you where it breaks.",
+    "Upload a flow, and AI users grounded in non-urban India — throttled connections, shared phones, first smartphones, five languages — walk through it and tell you where it breaks.",
 };
 
 export default function RootLayout({

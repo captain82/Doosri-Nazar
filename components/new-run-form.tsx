@@ -12,7 +12,8 @@ interface Draft {
   height: number;
 }
 
-const loadOn2G = (bytes: number) => (bytes / 30000).toFixed(1);
+// Worst realistic case: a phone throttled after its data pack runs out (~64kbps).
+const loadThrottled = (bytes: number) => (bytes / 12000).toFixed(1);
 
 export default function NewRunForm() {
   const router = useRouter();
@@ -171,7 +172,7 @@ export default function NewRunForm() {
                     className="w-full rounded border border-transparent bg-transparent px-1.5 py-1 text-sm outline-none transition-colors placeholder:text-ink-soft/60 focus:border-line focus:bg-paper"
                   />
                   <p className="mt-0.5 px-1.5 text-[11px] tabular-nums text-ink-soft">
-                    {Math.round(s.file.size / 1024)} KB · {s.width}×{s.height} · ~{loadOn2G(s.file.size)}s on 2G
+                    {Math.round(s.file.size / 1024)} KB · {s.width}×{s.height} · ~{loadThrottled(s.file.size)}s on a throttled phone
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
