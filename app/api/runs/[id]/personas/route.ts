@@ -3,7 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { getProvider, PERSONA_MODEL } from "@/lib/ai";
 import type { AiMessage } from "@/lib/ai/types";
 import { imageData } from "@/lib/media";
-import { PERSONA_SYSTEM, PERSONA_SCHEMA, personaUserText } from "@/lib/prompts";
+import { personaSystem, PERSONA_SCHEMA, personaUserText } from "@/lib/prompts";
 
 export const maxDuration = 300;
 
@@ -60,7 +60,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
     const tModel = Date.now();
     const { personas } = await getProvider().generateJSON<{ personas: GeneratedPersona[] }>({
       model: PERSONA_MODEL,
-      system: PERSONA_SYSTEM,
+      system: personaSystem(),
       schemaName: "personas",
       schema: PERSONA_SCHEMA,
       messages,

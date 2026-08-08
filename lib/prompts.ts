@@ -2,23 +2,58 @@
 // specific constraints every turn and ask what those constraints COST — that's
 // what produces field-report findings instead of accessibility-checklist items.
 
-export const PERSONA_SYSTEM = `You generate five test users for a product-design tool focused on NON-URBAN and small-town India. The single most important rule: these five must be five genuinely DIFFERENT HUMANS who fail — or succeed — for five DIFFERENT reasons. If your five people would give the same feedback in a different accent, you have failed. In particular, do NOT make everyone "a poor rural person who can't read English" — that is one archetype, not five people, and it makes every finding identical.
+// A curated library of real non-urban-India failure modes. The MENU is
+// hardcoded (this is domain expertise we want guaranteed); the PERSONAS are
+// generated. Each run samples a different subset (see personaSystem) so
+// different runs emphasise different lenses instead of always the same few.
+export const LENS_POOL: string[] = [
+  `TRUST & FEAR: scammed before (fake KYC, lottery, OTP fraud) — treats "verify", "pay", or any link as a trap and wants a human to vouch. Or the inverse: over-trusts, taps Allow/Yes/Pay without reading.`,
+  `MONEY SHAPE: thinks in daily ₹10–50; income arrives daily or only post-harvest; a fee is a "how many days of food" calculation, not a price; needs the full total upfront, pay-later, or cash.`,
+  `PRIDE & FACE: will not admit confusion or ask for help; guesses confidently and fails SILENTLY rather than dropping or asking.`,
+  `PHONE NOT PRIVATE / NOT THEIRS: shared or monitored phone; cannot take a private call; account or number belongs to a husband/son; only stolen 1–2 minute windows to use it.`,
+  `INPUT STYLE: fluent speaker, cannot type; lives in voice notes and calls; typing a name, an email, or a search term is a wall.`,
+  `ONE-APP MENTAL MODEL: learned smartphones through exactly one app (WhatsApp / a payments app / a game) and expects everything to behave like it.`,
+  `PRIOR-SYSTEM MODEL: reference point is the govt hospital / ration shop / bank queue — expects a token, a line, a person at a desk, a stamped receipt; distrusts a self-serve screen with no human confirming anything.`,
+  `PHYSICAL REALITY: cracked screen with a dead zone, unresponsive touch, bright-sunlight outdoor use, one hand busy at work, loud surroundings, no earphones for a call.`,
+  `TIME & RHYTHM: only gets 1–2 minute windows and is constantly interrupted (loses progress); or money and free time follow farming/festival cycles that clash with fixed weekday slots.`,
+  `COLLECTIVE DECISION: cannot decide alone — a health or money choice needs a husband, father, or elder who is not present right now.`,
+  `LITERACY: reads no English; or reads no script at all and navigates by icon and colour; or reads plain spoken Hindi but not stiff Sanskritised Hindi or English loanwords.`,
+  `NOTIFICATION & SMS: keeps the phone on silent and misses the OTP; or trusts the SMS as the only proof and re-does or re-pays because the app screen never clearly confirmed.`,
+  `STORAGE & OLD OS: cheap phone perpetually "storage full" — can't install or update the app, uploads fail, the app crashes or renders oddly on an old Android version.`,
+  `IDENTITY MISMATCH: name on Aadhaar ≠ name in the app ≠ name on the SIM; two SIMs; recently changed number; any KYC or "verify your identity" step collapses.`,
+  `GENDER & PERMISSION: needs permission to spend or to consult a male provider; searches and history are seen by family; cannot be alone with the phone long enough to finish.`,
+  `AGENT-MEDIATED: the real first-time user is a shopkeeper / Common Service Centre operator doing it FOR someone — so the account, the literacy, and the phone all belong to the operator, not the patient.`,
+  `STATUS ANXIETY: desperate not to look poor or uneducated; will abandon quietly rather than be seen struggling, and never asks for help in public.`,
+  `DOMAIN LITERACY: does not know the product's jargon (specialty names, "consultation", "slot", plan tiers); self-navigates by everyday words or body part and confidently picks the wrong thing.`,
+  `URGENCY STATE: in pain, panic, or a hurry — no patience for onboarding, wants the single fastest path to a real human, and rage-quits anything that asks for more than the minimum.`,
+  `LOW VISION / AGE: presbyopia and small grey low-contrast text; needs large touch targets; mis-taps adjacent controls and cannot read fine print like fees or terms.`,
+  `PAST FAILED ATTEMPT: tried a similar app before and it charged them, failed, or never showed a result — approaches this one with specific learned distrust and looks for proof it will actually work.`,
+];
 
-Real non-urban India is not one archetype. It holds the suspicious man who was scammed once and now trusts nothing; the proud elder who will never admit he is confused and taps confidently into the wrong choice; the sharp teenager who over-trusts because she wants to look modern; the daily-wage worker doing ₹20-at-a-time math in his head; the woman who cannot take a video call because neither the phone nor the room is ever private; the WhatsApp-voice-note native who speaks four languages but cannot type one; the shopkeeper whose entire mental model of "booking" is the government hospital token queue. Same screen — completely different experience.
+// Shuffle (Fisher–Yates) and take a subset. Server-side only — Math.random is
+// fine here (unlike workflow scripts).
+function sampleLenses(pool: string[], n: number): string[] {
+  const a = [...pool];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, n);
+}
 
-Give each of the five a DIFFERENT DOMINANT LENS: the one thing that most shapes how they experience THIS product. Draw each persona's lens from a DIFFERENT family below (never repeat a family), and make at MOST TWO people primarily about language/literacy:
+// Built fresh per run so the sampled lens mix (and therefore the kinds of
+// people) varies from run to run.
+export function personaSystem(): string {
+  const lenses = sampleLenses(LENS_POOL, 7);
+  return `You generate five test users for a product-design tool focused on NON-URBAN and small-town India. The single most important rule: these five must be five genuinely DIFFERENT HUMANS who fail — or succeed — for five DIFFERENT reasons. If your five people would give the same feedback in a different accent, you have failed. In particular, do NOT make everyone "a poor rural person who can't read English" — that is one archetype, not five people, and it makes every finding identical.
 
-- TRUST & FEAR: scammed before (fake KYC, lottery, OTP fraud) — treats "verify", "pay", or any link as a trap, wants a human to vouch. Or the inverse: over-trusts, taps Allow/Yes/Pay without reading.
-- MONEY SHAPE: thinks in daily ₹10–50; income arrives daily or only post-harvest; ₹299 is a "how many days of food" calculation, not a price; needs the full total upfront, pay-later, or cash.
-- PRIDE & FACE: will not admit confusion or ask for help; guesses confidently and fails SILENTLY rather than dropping or asking.
-- PHONE NOT PRIVATE / NOT THEIRS: shared or monitored phone; cannot take a private call; account or number belongs to a husband/son; only stolen 1–2 minute windows to use it.
-- INPUT STYLE: fluent speaker, cannot type; lives in voice notes and calls; typing a name, an email, or a search term is a wall.
-- ONE-APP MENTAL MODEL: learned smartphones through exactly one app (WhatsApp / a payments app / a game) and expects everything to behave like it.
-- PRIOR-SYSTEM MODEL: reference point is the govt hospital / ration shop / bank queue — expects a token, a line, a person at a desk, a stamped receipt; distrusts a self-serve screen with no human confirming anything.
-- PHYSICAL REALITY: cracked screen with a dead zone, unresponsive touch, bright-sunlight outdoor use, one hand busy at work, loud surroundings, no earphones for a call.
-- TIME & RHYTHM: only gets 1–2 minute windows and is constantly interrupted (loses progress); or money and free time follow farming/festival cycles that clash with "next slot Wednesday".
-- COLLECTIVE DECISION: cannot decide alone — a health or money choice needs a husband, father, or elder who is not present right now.
-- LITERACY (at most two of the five): reads no English; or reads no script at all and navigates by icon and colour; or reads plain spoken Hindi but not stiff Sanskritised Hindi or English loanwords.
+Real non-urban India is not one archetype. Same screen — completely different experience depending on who is holding the phone.
+
+Give each of the five a DIFFERENT DOMINANT LENS: the one thing that most shapes how they experience THIS product. Assign each persona a different lens drawn from the families below (never give two people the same family), and make at MOST TWO people primarily about language/literacy:
+
+${lenses.map((l) => `- ${l}`).join("\n")}
+
+If none of the above fits a genuinely real non-urban Indian user better, you may use one lens of your own — but it must be just as specific and just as different from the others.
 
 Spread the material BACKDROP across the five too, but treat it as backdrop, not the point: connection from "5G"/"4G"/"Weak 4G"/"Throttled" with at least two on degraded speed; device from new to old/shared/first-smartphone; and include at least ONE proxy user operating the app for someone else. Use connection values EXACTLY from: "5G", "4G", "Weak 4G", "Throttled".
 
@@ -27,6 +62,7 @@ Vary the obvious dimensions widely: age (teenager to elderly), gender, personali
 Each persona is a specific PERSON, not a label. Real name, real age. The "context" one-liner must make their DOMINANT LENS unmistakable — a reader should instantly know what uniquely trips THIS person up. Not "low literacy user" but "Cheated by a fake-KYC call last year — now closes any app that asks him to 'verify' or pay before he can see a real person." Fold the backdrop (connection, device, proxy) into the same line only after the lens is clear.
 
 Return ONLY the required structured output. No preamble.`;
+}
 
 export function personaUserText(description: string): string {
   return `Feature description:\n${description}\n\nThe attached image is the FIRST screen a user sees. Generate the five people who will now walk through this flow.`;
