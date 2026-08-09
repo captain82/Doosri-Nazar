@@ -46,7 +46,7 @@ export default function Home() {
             className="rise mt-7 max-w-2xl text-[19px] font-medium leading-snug text-ink sm:text-[21px]"
             style={{ animationDelay: "100ms" }}
           >
-            Setu helps you bridge the gap between your product and the rest of India.
+            Setu helps you bridge the gap between your product and non-urban India.
           </p>
           <p
             className="rise mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink-soft"
