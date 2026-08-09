@@ -309,6 +309,7 @@ export default function ResultsView({
   // Export: PDF via print (expand every card + hide chrome first), and a
   // one-click Markdown download.
   const [printing, setPrinting] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   useEffect(() => {
     if (!printing) return;
     const t = setTimeout(() => {
@@ -408,18 +409,46 @@ export default function ResultsView({
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={exportPdf}
-            className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
-          >
-            ↓ PDF
-          </button>
-          <button
-            onClick={exportMarkdown}
-            className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
-          >
-            ↓ Markdown
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen((v) => !v)}
+              aria-expanded={exportOpen}
+              className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
+            >
+              Export report ↓
+            </button>
+            {exportOpen && (
+              <>
+                <button
+                  aria-hidden
+                  onClick={() => setExportOpen(false)}
+                  className="fixed inset-0 z-40 cursor-default"
+                />
+                <div className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-lg border border-line bg-card shadow-lg">
+                  <button
+                    onClick={() => {
+                      setExportOpen(false);
+                      exportPdf();
+                    }}
+                    className="block w-full px-3.5 py-2.5 text-left text-[13px] transition-colors hover:bg-paper"
+                  >
+                    <span className="font-medium">PDF</span>
+                    <span className="text-ink-soft"> — print / save</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setExportOpen(false);
+                      exportMarkdown();
+                    }}
+                    className="block w-full border-t border-line px-3.5 py-2.5 text-left text-[13px] transition-colors hover:bg-paper"
+                  >
+                    <span className="font-medium">Markdown</span>
+                    <span className="text-ink-soft"> — .md file</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           <button
             onClick={() => setChatOpen(true)}
             className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
