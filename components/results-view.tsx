@@ -299,6 +299,34 @@ function ScreenSection({
   );
 }
 
+// ── Summary-strip icons ──────────────────────────────────────────────
+function IconUsers({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" />
+      <path d="M16 5.2a3 3 0 0 1 0 5.6M18.5 20c0-2.6-1-4.4-2.6-5.4" />
+    </svg>
+  );
+}
+function IconFlag({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M5 21V4" />
+      <path d="M5 4h11l-2 3 2 3H5" />
+    </svg>
+  );
+}
+function IconAlert({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M12 4 2.5 20h19L12 4Z" />
+      <path d="M12 10.5v4" />
+      <circle cx="12" cy="17.4" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 // ── Root ─────────────────────────────────────────────────────────────
 
 export default function ResultsView({
@@ -423,23 +451,50 @@ export default function ResultsView({
       </header>
 
       {/* Summary strip */}
-      <div className="rise mb-6 grid grid-cols-3 divide-x divide-line overflow-hidden rounded-lg border border-line bg-card shadow-[0_1px_2px_rgba(34,29,20,0.05)]" style={{ animationDelay: "60ms" }}>
-        <div className="min-w-0 px-3 py-4 sm:px-5">
-          <p className="font-display text-3xl font-semibold tabular-nums sm:text-4xl">{total}</p>
-          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">users tested</p>
-        </div>
-        <div className="min-w-0 px-3 py-4 sm:px-5">
-          <p className={`font-display text-3xl font-semibold tabular-nums sm:text-4xl ${reached < total / 2 ? "text-bad" : ""}`}>
-            {reached}
-            <span className="text-lg text-ink-soft sm:text-xl"> of {total}</span>
+      <div className="rise mb-6 grid grid-cols-3 gap-2.5 sm:gap-4" style={{ animationDelay: "60ms" }}>
+        {/* Users tested */}
+        <div className="flex min-w-0 flex-col rounded-2xl border border-[#C6D2E0] bg-[#E5EBF2] p-3.5 sm:p-5">
+          <div className="flex items-center gap-1.5 text-[#3B5273]">
+            <IconUsers className="hidden h-4 w-4 sm:block" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider sm:text-[11px]">Users tested</span>
+          </div>
+          <p className="mt-auto pt-3 font-display text-3xl font-semibold tabular-nums leading-none text-ink sm:text-[2.6rem]">
+            {total}
           </p>
-          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">reached the end</p>
         </div>
-        <div className="min-w-0 px-3 py-4 sm:px-5">
-          <p className="truncate font-display text-xl font-semibold leading-[1.6rem] sm:text-2xl sm:leading-[2.5rem]">
+
+        {/* Reached the end */}
+        <div
+          className={`flex min-w-0 flex-col rounded-2xl border p-3.5 sm:p-5 ${
+            reached < total / 2 ? "border-[#EAC7B7] bg-[#F8E6DD]" : "border-[#CFDCAF] bg-[#EDF1DE]"
+          }`}
+        >
+          <div className={`flex items-center gap-1.5 ${reached < total / 2 ? "text-bad" : "text-ok"}`}>
+            <IconFlag className="hidden h-4 w-4 sm:block" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider sm:text-[11px]">Reached the end</span>
+          </div>
+          <div className="mt-auto pt-3">
+            <p className="font-display text-3xl font-semibold tabular-nums leading-none text-ink sm:text-[2.6rem]">
+              {reached}
+              <span className="text-lg text-ink/45 sm:text-2xl"> of {total}</span>
+            </p>
+            <div className="mt-2.5 flex gap-1" aria-hidden>
+              {Array.from({ length: total }).map((_, i) => (
+                <span key={i} className={`h-1.5 flex-1 rounded-full ${i < reached ? "bg-ok/70" : "bg-ink/12"}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Worst screen */}
+        <div className="flex min-w-0 flex-col rounded-2xl border border-[#E7D6A4] bg-[#F8EFD7] p-3.5 sm:p-5">
+          <div className="flex items-center gap-1.5 text-warn">
+            <IconAlert className="hidden h-4 w-4 sm:block" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider sm:text-[11px]">Worst screen</span>
+          </div>
+          <p className="mt-auto truncate pt-3 font-display text-xl font-semibold leading-tight text-ink sm:text-[1.75rem]">
             {worstScreen?.label}
           </p>
-          <p className="mt-1 text-[11px] text-ink-soft sm:text-xs">worst screen</p>
         </div>
       </div>
 
