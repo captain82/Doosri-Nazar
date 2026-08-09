@@ -130,8 +130,8 @@ export default function ChatDrawer({
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-ink/30 sm:bg-ink/10" onClick={onClose} aria-hidden />
-      <aside className="rise fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-line bg-paper shadow-2xl">
+      <div className="no-print fixed inset-0 z-40 bg-ink/30 sm:bg-ink/10" onClick={onClose} aria-hidden />
+      <aside className="no-print rise fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-line bg-paper shadow-2xl">
         <header className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
           <div className="min-w-0">
             <p className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-terra">

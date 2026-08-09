@@ -4,12 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import ChatDrawer, { type ChatMessage, type PendingAsk } from "@/components/chat-drawer";
 import { userQuestions, screenQuestions } from "@/lib/questions";
 import { CHAT_STARTERS } from "@/lib/prompts";
+import { reportToMarkdown, reportSlug } from "@/lib/report-markdown";
 import type { Persona, RunReport, Screen, Step, StepStatus } from "@/lib/types";
 
 // Small row of scoped "ask" chips shown under a card/section.
 function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string) => void }) {
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-2">
+    <div className="no-print mt-3 flex flex-wrap items-center gap-2">
       <span className="font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-terra">Ask</span>
       {questions.map((q) => (
         <button
@@ -127,7 +128,7 @@ function PersonaCard({
           {badge.label}
         </span>
         <span
-          className={`hidden shrink-0 text-ink-soft transition-transform sm:block ${expanded ? "rotate-180" : ""}`}
+          className={`no-print hidden shrink-0 text-ink-soft transition-transform sm:block ${expanded ? "rotate-180" : ""}`}
           aria-hidden
         >
           ▾
@@ -140,7 +141,7 @@ function PersonaCard({
             const screen = screens.get(step.screen_id);
             const last = i === persona.steps.length - 1;
             return (
-              <li key={step.id} className="relative flex gap-3 pb-5 last:pb-1 sm:gap-4">
+              <li key={step.id} className="print-avoid-break relative flex gap-3 pb-5 last:pb-1 sm:gap-4">
                 {!last && (
                   <span className="absolute left-[13px] top-8 h-[calc(100%-2rem)] w-px bg-line" aria-hidden />
                 )}
@@ -305,6 +306,34 @@ export default function ResultsView({
     setChatOpen(true);
   };
 
+  // Export: PDF via print (expand every card + hide chrome first), and a
+  // one-click Markdown download.
+  const [printing, setPrinting] = useState(false);
+  useEffect(() => {
+    if (!printing) return;
+    const t = setTimeout(() => {
+      window.print();
+      setPrinting(false);
+    }, 120);
+    return () => clearTimeout(t);
+  }, [printing]);
+  const exportPdf = () => {
+    setExpanded(new Set(report.personas.map((p) => p.id)));
+    setChatOpen(false);
+    setPrinting(true);
+  };
+  const exportMarkdown = () => {
+    const blob = new Blob([reportToMarkdown(report)], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${reportSlug(report.title)}.md`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const reached = report.personas.filter((p) => p.outcome !== "dropped").length;
   const total = report.personas.length;
   const worstScreen = useMemo(() => {
@@ -361,8 +390,8 @@ export default function ResultsView({
         </div>
       </div>
 
-      {/* Toggle */}
-      <div className="rise mb-4 flex items-center justify-between" style={{ animationDelay: "120ms" }}>
+      {/* Toggle + export */}
+      <div className="rise no-print mb-4 flex flex-wrap items-center justify-between gap-2" style={{ animationDelay: "120ms" }}>
         <div className="inline-flex rounded-full border border-line bg-card p-0.5" role="tablist">
           {(["user", "screen"] as const).map((v) => (
             <button
@@ -378,12 +407,26 @@ export default function ResultsView({
             </button>
           ))}
         </div>
-        <button
-          onClick={() => setChatOpen(true)}
-          className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
-        >
-          Ask AI ✦
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportPdf}
+            className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
+          >
+            ↓ PDF
+          </button>
+          <button
+            onClick={exportMarkdown}
+            className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
+          >
+            ↓ Markdown
+          </button>
+          <button
+            onClick={() => setChatOpen(true)}
+            className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
+          >
+            Ask AI ✦
+          </button>
+        </div>
       </div>
 
       {view === "user" ? (
