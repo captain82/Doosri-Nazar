@@ -19,7 +19,7 @@ function Frame({
   return (
     <div className={`absolute ${className}`} style={{ ...style, width: w, transform: `rotate(${r}deg)` }} aria-hidden>
       <div
-        className="border-[6px] border-[#FCF8EF] bg-[#FCF8EF]"
+        className="border-[6px] border-paper bg-paper"
         style={{ filter: "url(#deckle) drop-shadow(0 11px 22px rgba(34,29,20,0.18))" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -33,7 +33,7 @@ function Frame({
 function Strip({ src }: { src: string }) {
   return (
     <div
-      className="aspect-[4/5] w-24 shrink-0 border-[5px] border-[#FCF8EF] bg-[#FCF8EF]"
+      className="aspect-[4/5] w-24 shrink-0 border-[5px] border-paper bg-paper"
       style={{ filter: "url(#deckle) drop-shadow(0 8px 16px rgba(34,29,20,0.16))" }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
