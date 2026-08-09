@@ -1,6 +1,6 @@
-# Doosri Nazar · दूसरी नज़र
+# Setu · सेतु
 
-**A second look at your design — through the eyes of the other India.**
+**A bridge between the people who build India's public services and the people they're for.**
 
 Live: **https://doosri-nazar.vercel.app** · Sample report: [/runs/demo](https://doosri-nazar.vercel.app/runs/demo)
 
@@ -10,7 +10,7 @@ Most software in India is designed and tested by people with new phones, fast in
 
 ## What it does
 
-Upload screenshots of a flow and describe what it does. Doosri Nazar generates AI users grounded in real non-urban Indian context — language, device age, connection speed, digital literacy, proxy use (operating an app on someone else's behalf) — and walks each one through your screens **in order, never seeing ahead**, so confusion accumulates the way it does for a real first-time user.
+Upload screenshots of a flow and describe what it does. Setu generates AI users grounded in real non-urban Indian context — language, device age, connection speed, digital literacy, proxy use (operating an app on someone else's behalf) — and walks each one through your screens **in order, never seeing ahead**, so confusion accumulates the way it does for a real first-time user.
 
 The output is a field report: where each user got stuck, what it cost them, and what to change.
 

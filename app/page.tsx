@@ -7,7 +7,7 @@ export default function Home() {
       <nav className="border-b border-line">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="font-display text-lg font-semibold tracking-tight">
-            Doosri Nazar <span className="ml-1 text-sm font-normal text-ink-soft">दूसरी नज़र</span>
+            Setu <span className="ml-1 text-sm font-normal text-ink-soft">सेतु</span>
           </span>
           <div className="flex items-center gap-5 text-[13px]">
             <Link href="/runs/demo" className="hidden text-ink-soft transition-colors hover:text-ink sm:inline">
@@ -32,7 +32,7 @@ export default function Home() {
         />
         <div className="mx-auto max-w-6xl px-6 pb-24 pt-20 sm:pt-28">
           <p className="rise font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-terra">
-            AI user testing for non-urban India · दूसरी नज़र
+            AI user testing for non-urban India · सेतु
           </p>
           <h1
             className="rise mt-6 max-w-4xl font-display text-[2.6rem] font-semibold leading-[1.04] sm:text-6xl md:text-[4.25rem]"
@@ -53,7 +53,7 @@ export default function Home() {
             className="rise mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink-soft"
             style={{ animationDelay: "150ms" }}
           >
-            Doosri Nazar sends AI users grounded in non-urban India — 2G data, five languages, shared
+            Setu sends AI users grounded in non-urban India — 2G data, five languages, shared
             phones, first smartphones — through your screens, and shows you exactly where they fall
             off. Before it goes live.
           </p>
@@ -283,11 +283,11 @@ export default function Home() {
       <footer className="border-t border-line">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-display text-sm font-semibold tracking-tight">
-            Doosri Nazar <span className="ml-1 font-normal text-ink-soft">दूसरी नज़र</span>
+            Setu <span className="ml-1 font-normal text-ink-soft">सेतु</span>
           </span>
           <p className="max-w-xl text-[12.5px] leading-relaxed text-ink-soft">
             Built for the BestPossible.AI hackathon, on the <em>Rural AI User Testing</em> idea. A
-            second look at your design — through the eyes of the other India.
+            bridge between your service and the India it&apos;s built to reach.
           </p>
         </div>
       </footer>
