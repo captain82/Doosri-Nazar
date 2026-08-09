@@ -1,17 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
-import ChatDrawer, { type ChatScope } from "@/components/chat-drawer";
+import { useEffect, useMemo, useRef, useState } from "react";
+import ChatDrawer, { type ChatMessage, type PendingAsk } from "@/components/chat-drawer";
 import { userQuestions, screenQuestions } from "@/lib/questions";
 import { CHAT_STARTERS } from "@/lib/prompts";
-import type { ChatTurn } from "@/lib/ai/types";
 import type { Persona, RunReport, Screen, Step, StepStatus } from "@/lib/types";
-
-interface OpenChat {
-  scope: ChatScope;
-  seed?: string;
-  suggestions: string[];
-}
 
 // Small row of scoped "ask" chips shown under a card/section.
 function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string) => void }) {
@@ -279,40 +272,38 @@ export default function ResultsView({
 
   const [view, setView] = useState<"user" | "screen">(initialView);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set([personas[0]?.id]));
-  const [chat, setChat] = useState<OpenChat | null>(null);
 
-  // Conversations persist per scope, across close/reopen and page reloads,
-  // keyed by run. Ephemeral to this browser (no DB).
+  // ONE merged conversation per run, persisted to localStorage (ephemeral to
+  // this browser, no DB). Each user turn carries its own scope badge.
   const storeKey = `dn-chat-${report.id}`;
-  const [convos, setConvos] = useState<Record<string, ChatTurn[]>>(() => {
-    if (typeof window === "undefined") return {};
+  const [chatOpen, setChatOpen] = useState(false);
+  const [pending, setPending] = useState<PendingAsk | null>(null);
+  const askId = useRef(0);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === "undefined") return [];
     try {
-      return JSON.parse(localStorage.getItem(storeKey) || "{}");
+      const v = JSON.parse(localStorage.getItem(storeKey) || "[]");
+      return Array.isArray(v) ? v : [];
     } catch {
-      return {};
+      return [];
     }
   });
   useEffect(() => {
     try {
-      localStorage.setItem(storeKey, JSON.stringify(convos));
+      localStorage.setItem(storeKey, JSON.stringify(messages));
     } catch {
       /* quota / private mode — chat just won't persist across reloads */
     }
-  }, [storeKey, convos]);
+  }, [storeKey, messages]);
 
-  const scopeKey = chat ? `${chat.scope.type}:${chat.scope.key}` : "";
-  const messagesForScope = chat ? convos[scopeKey] ?? [] : [];
-  const setMessagesForScope: Dispatch<SetStateAction<ChatTurn[]>> = (updater) =>
-    setConvos((prev) => {
-      const cur = prev[scopeKey] ?? [];
-      const nextArr = typeof updater === "function" ? updater(cur) : updater;
-      return { ...prev, [scopeKey]: nextArr };
-    });
-
-  const askUser = (p: Persona, q: string) =>
-    setChat({ scope: { type: "user", key: p.id, label: `${p.name}, ${p.age}` }, seed: q, suggestions: userQuestions(p) });
-  const askScreen = (s: Screen, q: string) =>
-    setChat({ scope: { type: "screen", key: s.id, label: s.label }, seed: q, suggestions: screenQuestions(s) });
+  const askUser = (p: Persona, q: string) => {
+    setPending({ id: ++askId.current, question: q, scope: { type: "user", label: `${p.name}, ${p.age}` } });
+    setChatOpen(true);
+  };
+  const askScreen = (s: Screen, q: string) => {
+    setPending({ id: ++askId.current, question: q, scope: { type: "screen", label: s.label } });
+    setChatOpen(true);
+  };
 
   const reached = report.personas.filter((p) => p.outcome !== "dropped").length;
   const total = report.personas.length;
@@ -388,12 +379,7 @@ export default function ResultsView({
           ))}
         </div>
         <button
-          onClick={() =>
-            setChat({
-              scope: { type: "flow", key: "flow", label: report.title },
-              suggestions: CHAT_STARTERS.map((s) => s.prompt),
-            })
-          }
+          onClick={() => setChatOpen(true)}
           className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
         >
           Ask AI ✦
@@ -430,15 +416,15 @@ export default function ResultsView({
         </div>
       )}
 
-      {chat && (
+      {chatOpen && (
         <ChatDrawer
           runId={report.id}
-          scope={chat.scope}
-          seed={chat.seed}
-          suggestions={chat.suggestions}
-          messages={messagesForScope}
-          setMessages={setMessagesForScope}
-          onClose={() => setChat(null)}
+          messages={messages}
+          setMessages={setMessages}
+          pending={pending}
+          onPendingHandled={() => setPending(null)}
+          suggestions={CHAT_STARTERS.map((s) => s.prompt)}
+          onClose={() => setChatOpen(false)}
         />
       )}
     </div>
