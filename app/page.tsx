@@ -46,16 +46,15 @@ export default function Home() {
             className="rise mt-7 max-w-2xl text-[19px] font-medium leading-snug text-ink sm:text-[21px]"
             style={{ animationDelay: "100ms" }}
           >
-            Bridging the gap between the people who build India&apos;s public services — and the
-            people they&apos;re for.
+            Setu helps you bridge the gap between your product and the rest of India.
           </p>
           <p
             className="rise mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink-soft"
             style={{ animationDelay: "150ms" }}
           >
-            Setu sends AI users grounded in non-urban India — 2G data, five languages, shared
-            phones, first smartphones — through your screens, and shows you exactly where they fall
-            off. Before it goes live.
+            It sends AI users grounded in non-urban India — 2G data, five languages, shared phones,
+            first smartphones — through your screens, and shows you exactly where they fall off.
+            Before it goes live.
           </p>
           <div className="rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: "200ms" }}>
             <Link
