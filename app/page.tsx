@@ -235,6 +235,7 @@ export default function Home() {
               Three steps
             </p>
             <h2 className="mt-3 font-serifd text-[32px] italic text-ink sm:text-[38px]">How it works?</h2>
+            <Squiggle className="mx-auto mt-3 h-3 w-24 text-terra/45" />
           </div>
 
           <div className="relative mt-16 grid gap-14 sm:grid-cols-3 sm:gap-10">
