@@ -16,7 +16,7 @@ function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string
         <button
           key={q}
           onClick={() => onAsk(q)}
-          className="rounded-full border border-line bg-paper px-2.5 py-1 text-[12px] text-ink transition-colors hover:border-ink-soft"
+          className="rounded-full border border-black/5 bg-white/70 px-2.5 py-1 text-[12px] text-ink transition-colors hover:border-ink-soft"
         >
           {q}
         </button>
@@ -228,12 +228,14 @@ function ScreenSection({
   screen,
   report,
   tones,
+  tint,
   onAsk,
   delay,
 }: {
   screen: Screen;
   report: RunReport;
   tones: Map<string, string>;
+  tint: (typeof CARD_TINTS)[number];
   onAsk: (q: string) => void;
   delay: number;
 }) {
@@ -243,54 +245,54 @@ function ScreenSection({
   const unreached = report.personas.length - rows.length;
   const count = (s: StepStatus) => rows.filter((r) => r.step.status === s).length;
   const segments = [
-    { n: count("ok"), cls: "bg-ok/70" },
-    { n: count("friction"), cls: "bg-warn/70" },
-    { n: count("dropped"), cls: "bg-bad/70" },
-    { n: unreached, cls: "bg-line" },
+    { n: count("ok"), cls: "bg-ok/80" },
+    { n: count("friction"), cls: "bg-warn/90" },
+    { n: count("dropped"), cls: "bg-bad/90" },
+    { n: unreached, cls: "bg-ink/15" },
   ].filter((s) => s.n > 0);
 
   return (
     <section
-      className="rise rounded-lg border border-line bg-card p-4 shadow-[0_1px_2px_rgba(34,29,20,0.05)] sm:p-5"
+      className={`rise print-avoid-break rounded-2xl border ${tint.border} ${tint.bg} p-4 shadow-[0_1px_2px_rgba(34,29,20,0.05)] sm:p-5`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="mb-1 flex items-baseline justify-between gap-3">
-        <h3 className="font-display text-lg font-semibold">
-          <span className="mr-2 text-ink-soft">{screen.position}.</span>
+      <div className="mb-2.5 flex items-baseline justify-between gap-3">
+        <h3 className="font-display text-lg font-semibold text-ink">
+          <span className="mr-2 text-ink/40">{screen.position}.</span>
           {screen.label}
         </h3>
-        <span className="text-xs text-ink-soft">
-          {count("dropped") > 0 && <span className="text-bad">{count("dropped")} left here · </span>}
-          {count("friction") > 0 && <span className="text-warn">{count("friction")} struggled · </span>}
+        <span className="shrink-0 text-xs text-ink/60">
+          {count("dropped") > 0 && <span className="font-medium text-bad">{count("dropped")} left here · </span>}
+          {count("friction") > 0 && <span className="font-medium text-warn">{count("friction")} struggled · </span>}
           {unreached > 0 ? `${unreached} never reached` : `${rows.length} of ${report.personas.length} saw it`}
         </span>
       </div>
-      <div className="mb-4 flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full" aria-hidden>
+      <div className="mb-4 flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full bg-white/50" aria-hidden>
         {segments.map((s, i) => (
           <span key={i} className={`${s.cls} h-full`} style={{ flexGrow: s.n }} />
         ))}
       </div>
-      <ul className="space-y-3">
+      <ul className="space-y-2">
         {rows.map(({ p, step }) => (
-          <li key={step.id} className="flex gap-2.5">
+          <li key={step.id} className="flex gap-2.5 rounded-xl bg-white/45 p-3">
             <Avatar persona={p} tone={tones.get(p.id)!} small />
             <div className="min-w-0 flex-1">
               <p className="text-[13.5px] leading-relaxed">
-                <span className="mr-1.5 font-medium">{p.name.split(" ")[0]}</span>
+                <span className="mr-1.5 font-medium text-ink">{p.name.split(" ")[0]}</span>
                 <span
                   className={`mr-1.5 inline-block h-2 w-2 rounded-full align-baseline ${
-                    step.status === "ok" ? "bg-ok/70" : step.status === "friction" ? "bg-warn/80" : "bg-bad/80"
+                    step.status === "ok" ? "bg-ok/80" : step.status === "friction" ? "bg-warn/90" : "bg-bad/90"
                   }`}
                   aria-label={step.status}
                 />
-                <span className="text-ink-soft">{step.narrative}</span>
+                <span className="text-ink/70">{step.narrative}</span>
               </p>
               {step.suggestion && <Suggestion text={step.suggestion} />}
             </div>
           </li>
         ))}
       </ul>
-      <div className="mt-3 border-t border-line pt-3">
+      <div className={`mt-3 border-t ${tint.border} pt-3`}>
         <AskChips questions={screenQuestions(screen)} onAsk={onAsk} />
       </div>
     </section>
@@ -525,13 +527,14 @@ export default function ResultsView({
           ))}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {report.screens.map((s, i) => (
             <ScreenSection
               key={s.id}
               screen={s}
               report={report}
               tones={tones}
+              tint={CARD_TINTS[i % CARD_TINTS.length]}
               onAsk={(q) => askScreen(s, q)}
               delay={i * 60}
             />
