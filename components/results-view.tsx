@@ -1,8 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import ChatPanel from "@/components/chat-panel";
+import ChatDrawer, { type ChatScope } from "@/components/chat-drawer";
+import { userQuestions, screenQuestions } from "@/lib/questions";
+import { CHAT_STARTERS } from "@/lib/prompts";
 import type { Persona, RunReport, Screen, Step, StepStatus } from "@/lib/types";
+
+interface OpenChat {
+  scope: ChatScope;
+  seed?: string;
+  suggestions: string[];
+}
+
+// Small row of scoped "ask" chips shown under a card/section.
+function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string) => void }) {
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      <span className="font-display text-[10px] font-semibold uppercase tracking-[0.16em] text-terra">Ask</span>
+      {questions.map((q) => (
+        <button
+          key={q}
+          onClick={() => onAsk(q)}
+          className="rounded-full border border-line bg-paper px-2.5 py-1 text-[12px] text-ink transition-colors hover:border-ink-soft"
+        >
+          {q}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 const AVATAR_TONES = [
   "bg-terra-tint text-terra-deep",
@@ -73,6 +99,7 @@ function PersonaCard({
   screens,
   expanded,
   onToggle,
+  onAsk,
   delay,
 }: {
   persona: Persona;
@@ -80,6 +107,7 @@ function PersonaCard({
   screens: Map<string, Screen>;
   expanded: boolean;
   onToggle: () => void;
+  onAsk: (q: string) => void;
   delay: number;
 }) {
   const badge = outcomeBadge(persona);
@@ -140,6 +168,9 @@ function PersonaCard({
               </li>
             );
           })}
+          <li className="border-t border-line pt-3">
+            <AskChips questions={userQuestions(persona)} onAsk={onAsk} />
+          </li>
         </ol>
       )}
     </div>
@@ -152,11 +183,13 @@ function ScreenSection({
   screen,
   report,
   tones,
+  onAsk,
   delay,
 }: {
   screen: Screen;
   report: RunReport;
   tones: Map<string, string>;
+  onAsk: (q: string) => void;
   delay: number;
 }) {
   const rows = report.personas
@@ -212,6 +245,9 @@ function ScreenSection({
           </li>
         ))}
       </ul>
+      <div className="mt-3 border-t border-line pt-3">
+        <AskChips questions={screenQuestions(screen)} onAsk={onAsk} />
+      </div>
     </section>
   );
 }
@@ -242,6 +278,12 @@ export default function ResultsView({
 
   const [view, setView] = useState<"user" | "screen">(initialView);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set([personas[0]?.id]));
+  const [chat, setChat] = useState<OpenChat | null>(null);
+
+  const askUser = (p: Persona, q: string) =>
+    setChat({ scope: { type: "user", label: `${p.name}, ${p.age}` }, seed: q, suggestions: userQuestions(p) });
+  const askScreen = (s: Screen, q: string) =>
+    setChat({ scope: { type: "screen", label: s.label }, seed: q, suggestions: screenQuestions(s) });
 
   const reached = report.personas.filter((p) => p.outcome !== "dropped").length;
   const total = report.personas.length;
@@ -316,9 +358,17 @@ export default function ResultsView({
             </button>
           ))}
         </div>
-        <p className="hidden text-xs text-ink-soft sm:block">
-          {report.screens.length} screens · {total} users · {report.personas.reduce((n, p) => n + p.steps.length, 0)} observations
-        </p>
+        <button
+          onClick={() =>
+            setChat({
+              scope: { type: "flow", label: report.title },
+              suggestions: CHAT_STARTERS.map((s) => s.prompt),
+            })
+          }
+          className="rounded-full border border-line bg-card px-3 py-1.5 text-[13px] font-medium text-ink transition-colors hover:border-ink-soft"
+        >
+          Ask AI ✦
+        </button>
       </div>
 
       {view === "user" ? (
@@ -331,6 +381,7 @@ export default function ResultsView({
               screens={screens}
               expanded={expanded.has(p.id)}
               onToggle={() => toggleCard(p.id)}
+              onAsk={(q) => askUser(p, q)}
               delay={160 + i * 60}
             />
           ))}
@@ -338,12 +389,27 @@ export default function ResultsView({
       ) : (
         <div className="space-y-3">
           {report.screens.map((s, i) => (
-            <ScreenSection key={s.id} screen={s} report={report} tones={tones} delay={i * 60} />
+            <ScreenSection
+              key={s.id}
+              screen={s}
+              report={report}
+              tones={tones}
+              onAsk={(q) => askScreen(s, q)}
+              delay={i * 60}
+            />
           ))}
         </div>
       )}
 
-      <ChatPanel runId={report.id} />
+      {chat && (
+        <ChatDrawer
+          runId={report.id}
+          scope={chat.scope}
+          seed={chat.seed}
+          suggestions={chat.suggestions}
+          onClose={() => setChat(null)}
+        />
+      )}
     </div>
   );
 }

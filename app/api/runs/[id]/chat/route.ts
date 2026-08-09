@@ -9,8 +9,21 @@ import type { RunReport } from "@/lib/types";
 
 export const maxDuration = 60;
 
+interface Scope {
+  type: "user" | "screen" | "flow";
+  label: string;
+}
+
+function focusNote(scope?: Scope): string {
+  if (!scope || scope.type === "flow") return "";
+  if (scope.type === "user") {
+    return `The designer is focused on the user "${scope.label}". Centre your answers on this specific person and their walkthrough; reference other users only for comparison.`;
+  }
+  return `The designer is focused on the screen "${scope.label}". Centre your answers on what happened on this screen across the different users.`;
+}
+
 export async function POST(request: Request, { params }: { params: { id: string } }) {
-  let body: { messages?: ChatTurn[] };
+  let body: { messages?: ChatTurn[]; scope?: Scope };
   try {
     body = await request.json();
   } catch {
@@ -35,7 +48,8 @@ export async function POST(request: Request, { params }: { params: { id: string 
   }
   if (!report) return NextResponse.json({ error: "Run not found." }, { status: 404 });
 
-  const system = `${CHAT_SYSTEM}\n\n=== THE REPORT ===\n${reportContext(report)}`;
+  const focus = focusNote(body.scope);
+  const system = `${CHAT_SYSTEM}${focus ? `\n\n${focus}` : ""}\n\n=== THE REPORT ===\n${reportContext(report)}`;
   const provider = getProvider();
 
   const encoder = new TextEncoder();
