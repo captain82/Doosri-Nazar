@@ -18,7 +18,10 @@ function Frame({
 }) {
   return (
     <div className={`absolute ${className}`} style={{ ...style, width: w, transform: `rotate(${r}deg)` }} aria-hidden>
-      <div className="overflow-hidden rounded-[3px] border-[5px] border-paper bg-card shadow-[0_10px_28px_rgba(34,29,20,0.16)]">
+      <div
+        className="border-[6px] border-[#FCF8EF] bg-[#FCF8EF]"
+        style={{ filter: "url(#deckle) drop-shadow(0 11px 22px rgba(34,29,20,0.18))" }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt="" className="block w-full object-cover" />
       </div>
@@ -29,7 +32,10 @@ function Frame({
 // Same illustration, inline (for the mobile strip).
 function Strip({ src }: { src: string }) {
   return (
-    <div className="aspect-[4/5] w-24 shrink-0 overflow-hidden rounded-[3px] border-[4px] border-paper bg-card shadow-[0_8px_20px_rgba(34,29,20,0.14)]">
+    <div
+      className="aspect-[4/5] w-24 shrink-0 border-[5px] border-[#FCF8EF] bg-[#FCF8EF]"
+      style={{ filter: "url(#deckle) drop-shadow(0 8px 16px rgba(34,29,20,0.16))" }}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" className="block h-full w-full object-cover" />
     </div>
@@ -39,6 +45,13 @@ function Strip({ src }: { src: string }) {
 export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden">
+      {/* Torn-paper / deckle edge for illustration frames */}
+      <svg width="0" height="0" className="absolute" aria-hidden focusable="false">
+        <filter id="deckle" x="-18%" y="-18%" width="136%" height="136%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.009 0.011" numOctaves="3" seed="8" result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       {/* ── Minimal top bar (the wordmark below is the brand) ── */}
       <nav className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-5 px-6 py-4 text-[13px] font-dm">
