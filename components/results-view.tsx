@@ -33,6 +33,25 @@ const AVATAR_TONES = [
   "bg-[#EFE3F0] text-[#6D3B73]",
 ];
 
+// Soft pastel tints for the persona cards — a rotating, colourful set.
+const CARD_TINTS = [
+  { bg: "bg-[#EDF1DE]", border: "border-[#CFDCAF]", chip: "bg-[#E0E8C6]" }, // green
+  { bg: "bg-[#EFE4F1]", border: "border-[#DAC4DC]", chip: "bg-[#E6D4E8]" }, // lilac
+  { bg: "bg-[#F8EFD7]", border: "border-[#E7D6A4]", chip: "bg-[#F1E4BF]" }, // butter
+  { bg: "bg-[#F8E6DD]", border: "border-[#EAC7B7]", chip: "bg-[#F2D8CA]" }, // blush
+  { bg: "bg-[#E5EBF2]", border: "border-[#C6D2E0]", chip: "bg-[#D8E1EC]" }, // sky
+];
+
+// The single most telling step for a persona — where they quit, else the
+// first friction, else their last step — used as the card's headline moment.
+function keyStep(p: Persona): Step | undefined {
+  return (
+    p.steps.find((s) => s.status === "dropped") ??
+    p.steps.find((s) => s.status === "friction") ??
+    p.steps[p.steps.length - 1]
+  );
+}
+
 const STEP_DOT: Record<StepStatus, string> = {
   ok: "bg-ok-tint text-ok border-ok/30",
   friction: "bg-warn-tint text-warn border-warn/30",
@@ -47,11 +66,6 @@ function outcomeBadge(p: Persona) {
   if (p.outcome === "struggled")
     return { label: "Finished, struggled", cls: "bg-warn-tint text-warn" };
   return { label: "Completed", cls: "bg-ok-tint text-ok" };
-}
-
-function contextLine(p: Persona) {
-  const detail = p.context.split("·")[0].trim();
-  return `${p.language} · ${p.connection} · ${detail}`;
 }
 
 function MetricTags({ step, persona }: { step: Step; persona: Persona }) {
@@ -88,9 +102,16 @@ function Avatar({ persona, tone, small }: { persona: Persona; tone: string; smal
 
 // ── By user ──────────────────────────────────────────────────────────
 
+const OUTCOME_DOT: Record<Persona["outcome"], string> = {
+  dropped: "bg-bad",
+  struggled: "bg-warn",
+  completed: "bg-ok",
+};
+
 function PersonaCard({
   persona,
   tone,
+  tint,
   screens,
   expanded,
   onToggle,
@@ -99,6 +120,7 @@ function PersonaCard({
 }: {
   persona: Persona;
   tone: string;
+  tint: (typeof CARD_TINTS)[number];
   screens: Map<string, Screen>;
   expanded: boolean;
   onToggle: () => void;
@@ -106,44 +128,72 @@ function PersonaCard({
   delay: number;
 }) {
   const badge = outcomeBadge(persona);
+  const key = keyStep(persona);
+  const keyScreen = key ? screens.get(key.screen_id) : undefined;
+  const reached = persona.steps.filter((s) => s.status !== "dropped").length;
+
   return (
     <div
-      className="rise overflow-hidden rounded-lg border border-line bg-card shadow-[0_1px_2px_rgba(34,29,20,0.05)]"
+      className={`rise print-avoid-break flex flex-col overflow-hidden rounded-2xl border ${tint.border} ${tint.bg} shadow-[0_1px_2px_rgba(34,29,20,0.05)]`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <button
         onClick={onToggle}
         aria-expanded={expanded}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-paper sm:gap-4 sm:px-5"
+        className="flex-1 p-4 text-left sm:p-5"
       >
-        <Avatar persona={persona} tone={tone} />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate font-medium">
-            {persona.name}
-            <span className="ml-1.5 text-ink-soft">{persona.age}</span>
+        {/* Tag row */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className={`rounded-full ${tint.chip} px-2 py-0.5 text-[11px] font-medium text-ink/70`}>
+            {persona.language}
           </span>
-          <span className="block truncate text-[13px] text-ink-soft">{contextLine(persona)}</span>
-        </span>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${badge.cls}`}>
-          {badge.label}
-        </span>
-        <span
-          className={`no-print hidden shrink-0 text-ink-soft transition-transform sm:block ${expanded ? "rotate-180" : ""}`}
-          aria-hidden
-        >
-          ▾
-        </span>
+          <span className={`rounded-full ${tint.chip} px-2 py-0.5 text-[11px] font-medium text-ink/70`}>
+            {persona.connection}
+          </span>
+          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2.5 py-1 text-[11.5px] font-medium text-ink/80">
+            <span className={`h-1.5 w-1.5 rounded-full ${OUTCOME_DOT[persona.outcome]}`} />
+            {badge.label}
+          </span>
+        </div>
+
+        {/* Name */}
+        <h3 className="mt-3 font-display text-[19px] font-semibold leading-tight text-ink">
+          {persona.name} <span className="font-normal text-ink/50">{persona.age}</span>
+        </h3>
+        <p className="mt-0.5 text-[12.5px] text-ink/55">{persona.context.split("·")[0].trim()}</p>
+
+        {/* Key moment */}
+        {key && (
+          <div className="mt-3.5">
+            <p className="font-display text-[10.5px] font-semibold uppercase tracking-wider text-ink/50">
+              {persona.outcome === "dropped" ? "Where they quit" : "The sticking point"}
+              {keyScreen ? ` · ${keyScreen.label}` : ""}
+            </p>
+            <p className="mt-1 text-[13.5px] leading-relaxed text-ink/80 line-clamp-3">{key.narrative}</p>
+          </div>
+        )}
+
+        {/* Footer */}
+        <div className={`mt-4 flex items-center gap-2 border-t ${tint.border} pt-3`}>
+          <Avatar persona={persona} tone={tone} small />
+          <span className="text-[12px] text-ink/55">
+            {reached}/{persona.steps.length} screens
+          </span>
+          <span className="no-print ml-auto text-[12px] font-medium text-ink/60">
+            {expanded ? "Hide walkthrough ▴" : "Full walkthrough ▾"}
+          </span>
+        </div>
       </button>
 
       {expanded && (
-        <ol className="border-t border-line px-4 py-4 sm:px-5">
+        <ol className="border-t border-white/50 bg-white/35 px-4 py-4 sm:px-5">
           {persona.steps.map((step, i) => {
             const screen = screens.get(step.screen_id);
             const last = i === persona.steps.length - 1;
             return (
               <li key={step.id} className="print-avoid-break relative flex gap-3 pb-5 last:pb-1 sm:gap-4">
                 {!last && (
-                  <span className="absolute left-[13px] top-8 h-[calc(100%-2rem)] w-px bg-line" aria-hidden />
+                  <span className="absolute left-[13px] top-8 h-[calc(100%-2rem)] w-px bg-ink/10" aria-hidden />
                 )}
                 <span
                   className={`z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums ${STEP_DOT[step.status]}`}
@@ -163,7 +213,7 @@ function PersonaCard({
               </li>
             );
           })}
-          <li className="border-t border-line pt-3">
+          <li className="border-t border-ink/10 pt-3">
             <AskChips questions={userQuestions(persona)} onAsk={onAsk} />
           </li>
         </ol>
@@ -272,7 +322,7 @@ export default function ResultsView({
   );
 
   const [view, setView] = useState<"user" | "screen">(initialView);
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set([personas[0]?.id]));
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
 
   // ONE merged conversation per run, persisted to localStorage (ephemeral to
   // this browser, no DB). Each user turn carries its own scope badge.
@@ -459,12 +509,13 @@ export default function ResultsView({
       </div>
 
       {view === "user" ? (
-        <div className="space-y-3">
+        <div className="report-grid grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
           {personas.map((p, i) => (
             <PersonaCard
               key={p.id}
               persona={p}
               tone={tones.get(p.id)!}
+              tint={CARD_TINTS[i % CARD_TINTS.length]}
               screens={screens}
               expanded={expanded.has(p.id)}
               onToggle={() => toggleCard(p.id)}

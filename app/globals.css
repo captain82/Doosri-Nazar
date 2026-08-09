@@ -75,4 +75,11 @@ body {
   .print-avoid-break {
     break-inside: avoid;
   }
+  /* persona cards print one-per-row so full walkthroughs don't split awkwardly */
+  .report-grid {
+    display: block !important;
+  }
+  .report-grid > * {
+    margin-bottom: 0.75rem;
+  }
 }
