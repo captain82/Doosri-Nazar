@@ -142,31 +142,49 @@ export default function Home() {
 
       {/* ── How it works ── */}
       <section>
-        <div className="mx-auto max-w-5xl px-6 pb-8 pt-6">
-          <h2 className="text-center font-serifd text-[30px] italic text-ink sm:text-[36px]">How it works?</h2>
+        <div className="mx-auto max-w-5xl px-6 pb-10 pt-8 sm:pb-16">
+          <div className="text-center">
+            <p className="font-dm text-[11px] font-semibold uppercase tracking-[0.24em] text-ink-soft">
+              Three steps
+            </p>
+            <h2 className="mt-3 font-serifd text-[32px] italic text-ink sm:text-[38px]">How it works?</h2>
+          </div>
 
-          <div className="mt-16 grid gap-14 sm:grid-cols-3 sm:gap-8">
+          <div className="relative mt-16 grid gap-14 sm:grid-cols-3 sm:gap-10">
+            {/* dashed connector across the numbered badges (desktop) */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-[16.6%] right-[16.6%] top-4 hidden border-t border-dashed border-terra/25 sm:block"
+            />
+
             {/* 1 — upload */}
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-36 items-center">
-                <div className="flex h-[9.5rem] w-[6.5rem] rotate-[-5deg] items-center justify-center rounded-[18px] border border-dashed border-[#ff5700]/60 bg-[#fe9c7c]/20">
+            <div className="relative flex flex-col items-center text-center">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+                1
+              </span>
+              <div className="mt-9 flex h-32 items-center justify-center">
+                <div className="flex h-28 w-[5.5rem] rotate-[-4deg] items-center justify-center rounded-[20px] border-2 border-dashed border-terra/40 bg-terra-tint/50 shadow-[0_10px_24px_rgba(181,69,27,0.08)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/il/upload.svg" alt="" className="h-7 w-7 opacity-70" />
+                  <img src="/il/upload.svg" alt="" className="h-7 w-7 opacity-60" />
                 </div>
               </div>
-              <p className="mt-6 max-w-[15rem] font-dm text-[15px] leading-relaxed text-ink">
-                Upload your app screenshots, in the order a citizen meets them.
+              <h3 className="mt-7 font-serifd text-[20px] text-ink">Upload the flow</h3>
+              <p className="mt-2 max-w-[16rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+                Add your app screenshots, in the order a citizen meets them.
               </p>
             </div>
 
             {/* 2 — personas */}
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-36 items-center">
-                <div className="flex -space-x-3">
+            <div className="relative flex flex-col items-center text-center">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+                2
+              </span>
+              <div className="mt-9 flex h-32 items-center justify-center">
+                <div className="flex -space-x-3.5">
                   {["f1", "f2", "f3", "f4"].map((f, i) => (
                     <span
                       key={f}
-                      className="h-16 w-16 overflow-hidden rounded-full border-[3px] border-paper shadow-sm"
+                      className="h-[4.25rem] w-[4.25rem] overflow-hidden rounded-full border-[3px] border-paper shadow-[0_6px_16px_rgba(34,29,20,0.14)]"
                       style={{ zIndex: 4 - i }}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -175,30 +193,39 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <p className="mt-6 max-w-[19rem] font-dm text-[15px] leading-relaxed text-ink">
-                AI personas grounded in non-urban India — with 20+ variables like education, language
-                and network — walk through your screens, one by one.
+              <h3 className="mt-7 font-serifd text-[20px] text-ink">Meet the users</h3>
+              <p className="mt-2 max-w-[18.5rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+                AI personas grounded in non-urban India — 20+ variables like language, literacy and
+                network — walk each screen, one by one.
               </p>
             </div>
 
             {/* 3 — report */}
-            <div className="flex flex-col items-center text-center">
-              <div className="flex h-36 items-center">
-                <div className="w-28 rotate-[4deg] rounded-lg border border-line bg-card p-2.5 shadow-[0_8px_20px_rgba(34,29,20,0.1)]">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-4 w-4 rounded-full bg-ok-tint" />
-                    <span className="h-1.5 w-9 rounded bg-line" />
-                    <span className="ml-auto h-2.5 w-6 rounded-full bg-bad-tint" />
+            <div className="relative flex flex-col items-center text-center">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+                3
+              </span>
+              <div className="mt-9 flex h-32 items-center justify-center">
+                <div className="relative">
+                  {/* stacked card behind for depth */}
+                  <div className="absolute -right-2.5 -top-2 h-full w-full rotate-[7deg] rounded-lg border border-line bg-card/70" />
+                  <div className="relative w-28 rotate-[3deg] rounded-lg border border-line bg-card p-3 shadow-[0_12px_26px_rgba(34,29,20,0.12)]">
+                    <div className="flex items-center gap-1.5">
+                      <span className="h-4 w-4 rounded-full bg-ok-tint" />
+                      <span className="h-1.5 w-9 rounded bg-line" />
+                      <span className="ml-auto h-2.5 w-6 rounded-full bg-bad-tint" />
+                    </div>
+                    <div className="mt-2.5 space-y-1.5">
+                      <span className="block h-1.5 w-full rounded bg-line" />
+                      <span className="block h-1.5 w-4/5 rounded bg-line" />
+                    </div>
+                    <div className="mt-2.5 h-4 rounded bg-terra-tint" />
                   </div>
-                  <div className="mt-2 space-y-1">
-                    <span className="block h-1.5 w-full rounded bg-line" />
-                    <span className="block h-1.5 w-4/5 rounded bg-line" />
-                  </div>
-                  <div className="mt-2 h-4 rounded bg-terra-tint" />
                 </div>
               </div>
-              <p className="mt-6 max-w-[16rem] font-dm text-[15px] leading-relaxed text-ink">
-                A field report: who got stuck, on which screen, where they dropped off — and much more.
+              <h3 className="mt-7 font-serifd text-[20px] text-ink">Read the field report</h3>
+              <p className="mt-2 max-w-[16.5rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+                See who got stuck, on which screen, and the moment they gave up.
               </p>
             </div>
           </div>
