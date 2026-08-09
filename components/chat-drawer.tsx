@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { ChatTurn } from "@/lib/ai/types";
 
 export interface ChatScope {
   type: "user" | "screen" | "flow";
+  key: string;
   label: string;
 }
 
@@ -13,15 +14,18 @@ export default function ChatDrawer({
   scope,
   seed,
   suggestions,
+  messages,
+  setMessages,
   onClose,
 }: {
   runId: string;
   scope: ChatScope;
   seed?: string;
   suggestions: string[];
+  messages: ChatTurn[];
+  setMessages: Dispatch<SetStateAction<ChatTurn[]>>;
   onClose: () => void;
 }) {
-  const [messages, setMessages] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -73,9 +77,10 @@ export default function ChatDrawer({
     }
   };
 
-  // Auto-send the tapped question when the drawer opens with a seed.
+  // Auto-send the tapped question only for a fresh conversation. If we're
+  // reopening one that already has history, just show it (don't re-ask).
   useEffect(() => {
-    if (seed && !seeded.current) {
+    if (seed && !seeded.current && messages.length === 0) {
       seeded.current = true;
       send(seed);
     }
@@ -108,13 +113,26 @@ export default function ChatDrawer({
             </p>
             <p className="mt-0.5 truncate font-display text-lg font-semibold">{scope.label}</p>
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="shrink-0 rounded-full border border-line px-2 py-0.5 text-ink-soft transition-colors hover:border-ink-soft hover:text-ink"
-          >
-            ✕
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            {messages.length > 0 && !streaming && (
+              <button
+                onClick={() => {
+                  seeded.current = true; // don't re-seed after a manual clear
+                  setMessages([]);
+                }}
+                className="text-[12px] text-ink-soft transition-colors hover:text-ink"
+              >
+                Clear
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="rounded-full border border-line px-2 py-0.5 text-ink-soft transition-colors hover:border-ink-soft hover:text-ink"
+            >
+              ✕
+            </button>
+          </div>
         </header>
 
         <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5">

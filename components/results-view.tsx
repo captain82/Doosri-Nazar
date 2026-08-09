@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import ChatDrawer, { type ChatScope } from "@/components/chat-drawer";
 import { userQuestions, screenQuestions } from "@/lib/questions";
 import { CHAT_STARTERS } from "@/lib/prompts";
+import type { ChatTurn } from "@/lib/ai/types";
 import type { Persona, RunReport, Screen, Step, StepStatus } from "@/lib/types";
 
 interface OpenChat {
@@ -280,10 +281,38 @@ export default function ResultsView({
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set([personas[0]?.id]));
   const [chat, setChat] = useState<OpenChat | null>(null);
 
+  // Conversations persist per scope, across close/reopen and page reloads,
+  // keyed by run. Ephemeral to this browser (no DB).
+  const storeKey = `dn-chat-${report.id}`;
+  const [convos, setConvos] = useState<Record<string, ChatTurn[]>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem(storeKey) || "{}");
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(storeKey, JSON.stringify(convos));
+    } catch {
+      /* quota / private mode — chat just won't persist across reloads */
+    }
+  }, [storeKey, convos]);
+
+  const scopeKey = chat ? `${chat.scope.type}:${chat.scope.key}` : "";
+  const messagesForScope = chat ? convos[scopeKey] ?? [] : [];
+  const setMessagesForScope: Dispatch<SetStateAction<ChatTurn[]>> = (updater) =>
+    setConvos((prev) => {
+      const cur = prev[scopeKey] ?? [];
+      const nextArr = typeof updater === "function" ? updater(cur) : updater;
+      return { ...prev, [scopeKey]: nextArr };
+    });
+
   const askUser = (p: Persona, q: string) =>
-    setChat({ scope: { type: "user", label: `${p.name}, ${p.age}` }, seed: q, suggestions: userQuestions(p) });
+    setChat({ scope: { type: "user", key: p.id, label: `${p.name}, ${p.age}` }, seed: q, suggestions: userQuestions(p) });
   const askScreen = (s: Screen, q: string) =>
-    setChat({ scope: { type: "screen", label: s.label }, seed: q, suggestions: screenQuestions(s) });
+    setChat({ scope: { type: "screen", key: s.id, label: s.label }, seed: q, suggestions: screenQuestions(s) });
 
   const reached = report.personas.filter((p) => p.outcome !== "dropped").length;
   const total = report.personas.length;
@@ -361,7 +390,7 @@ export default function ResultsView({
         <button
           onClick={() =>
             setChat({
-              scope: { type: "flow", label: report.title },
+              scope: { type: "flow", key: "flow", label: report.title },
               suggestions: CHAT_STARTERS.map((s) => s.prompt),
             })
           }
@@ -407,6 +436,8 @@ export default function ResultsView({
           scope={chat.scope}
           seed={chat.seed}
           suggestions={chat.suggestions}
+          messages={messagesForScope}
+          setMessages={setMessagesForScope}
           onClose={() => setChat(null)}
         />
       )}
