@@ -32,30 +32,30 @@ export default function Home() {
         />
         <div className="mx-auto max-w-6xl px-6 pb-24 pt-20 sm:pt-28">
           <p className="rise font-display text-[11px] font-semibold uppercase tracking-[0.22em] text-terra">
-            A second look · दूसरी नज़र
+            AI user testing for non-urban India · दूसरी नज़र
           </p>
           <h1
             className="rise mt-6 max-w-4xl font-display text-[2.6rem] font-semibold leading-[1.04] sm:text-6xl md:text-[4.25rem]"
             style={{ animationDelay: "60ms" }}
           >
-            Your service works.
+            See where your service fails
             <br />
-            <span className="italic text-terra">For people like you.</span>
+            <span className="italic text-terra">the people it&apos;s built for.</span>
           </h1>
           <p
             className="rise mt-8 max-w-2xl text-[17px] leading-relaxed text-ink-soft"
             style={{ animationDelay: "120ms" }}
           >
-            Everyone else — the farmer on 2G, the widow on a borrowed phone, the elder who reads no
-            English — is quietly designed out of the schemes, clinics and welfare apps built to reach
-            them. Not deliberately. Invisibly.
+            Doosri Nazar sends AI users grounded in non-urban India — 2G data, five languages, shared
+            phones, first smartphones — through your screens, and shows you exactly where they fall
+            off. Before it goes live.
           </p>
           <p
             className="rise mt-4 max-w-2xl text-[17px] leading-relaxed text-ink"
             style={{ animationDelay: "160ms" }}
           >
-            Doosri Nazar walks AI users grounded in non-urban India through your screens and shows
-            you exactly where they fall off — before it goes live.
+            The farmer on 2G, the widow on a borrowed phone, the elder who reads no English — designed
+            out of the very services built to reach them. Not deliberately. Invisibly.
           </p>
           <div className="rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: "200ms" }}>
             <Link
