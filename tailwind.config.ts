@@ -5,9 +5,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: "#F6F1E8",
-        "paper-deep": "#EFE8DA",
-        card: "#FDFBF6",
+        paper: "#FFFFFF",
+        "paper-deep": "#F1F0ED",
+        card: "#FFFFFF",
         ink: "#221D14",
         "ink-soft": "#6E6455",
         line: "#E0D7C6",

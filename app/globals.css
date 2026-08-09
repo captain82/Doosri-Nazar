@@ -3,13 +3,7 @@
 @tailwind utilities;
 
 body {
-  /* faint paper grain */
-  background-image: radial-gradient(
-      circle at 1px 1px,
-      rgba(34, 29, 20, 0.035) 1px,
-      transparent 0
-    );
-  background-size: 26px 26px;
+  background-color: #ffffff;
 }
 
 @keyframes rise {
