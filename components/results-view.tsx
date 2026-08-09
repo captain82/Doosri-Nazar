@@ -25,21 +25,14 @@ function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string
   );
 }
 
-const AVATAR_TONES = [
-  "bg-terra-tint text-terra-deep",
-  "bg-ok-tint text-ok",
-  "bg-warn-tint text-warn",
-  "bg-[#E4E9F0] text-[#3B5273]",
-  "bg-[#EFE3F0] text-[#6D3B73]",
-];
-
-// Soft pastel tints for the persona cards — a rotating, colourful set.
+// Soft pastel tints — a rotating, colourful set, kept quiet and low-contrast
+// so the cards read as calm coloured fills rather than loud blocks.
 const CARD_TINTS = [
-  { bg: "bg-[#EDF1DE]", border: "border-[#CFDCAF]", chip: "bg-[#E0E8C6]" }, // green
-  { bg: "bg-[#EFE4F1]", border: "border-[#DAC4DC]", chip: "bg-[#E6D4E8]" }, // lilac
-  { bg: "bg-[#F8EFD7]", border: "border-[#E7D6A4]", chip: "bg-[#F1E4BF]" }, // butter
-  { bg: "bg-[#F8E6DD]", border: "border-[#EAC7B7]", chip: "bg-[#F2D8CA]" }, // blush
-  { bg: "bg-[#E5EBF2]", border: "border-[#C6D2E0]", chip: "bg-[#D8E1EC]" }, // sky
+  { bg: "bg-[#F1F4E9]", border: "border-[#E3E8D2]", line: "border-[#DCE3C6]" }, // green
+  { bg: "bg-[#F4EFF5]", border: "border-[#E8DEEA]", line: "border-[#E0D2E3]" }, // lilac
+  { bg: "bg-[#FAF4E4]", border: "border-[#EEE3C8]", line: "border-[#E9DBB8]" }, // butter
+  { bg: "bg-[#FAEFE9]", border: "border-[#EFDFD5]", line: "border-[#EDD5C8]" }, // blush
+  { bg: "bg-[#EEF2F7]", border: "border-[#DFE6EF]", line: "border-[#D6E0EB]" }, // sky
 ];
 
 // The single most telling step for a persona — where they quit, else the
@@ -79,24 +72,12 @@ function MetricTags({ step, persona }: { step: Step; persona: Persona }) {
 
 function Suggestion({ text }: { text: string }) {
   return (
-    <div className="mt-2 rounded-md border border-terra/20 bg-terra-tint px-3 py-2">
-      <span className="mr-1.5 font-display text-[11px] font-semibold uppercase tracking-wider text-terra-deep">
-        What to change
+    <div className="mt-2 rounded-lg bg-terra-tint/60 px-3 py-2">
+      <span className="mr-1.5 font-display text-[10px] font-semibold uppercase tracking-wider text-terra-deep">
+        Fix
       </span>
-      <span className="text-[13px] leading-relaxed text-ink">{text}</span>
+      <span className="text-[12px] leading-relaxed text-ink/80">{text}</span>
     </div>
-  );
-}
-
-function Avatar({ persona, tone, small }: { persona: Persona; tone: string; small?: boolean }) {
-  return (
-    <span
-      className={`flex shrink-0 items-center justify-center rounded-full font-display font-semibold ${tone} ${
-        small ? "h-6 w-6 text-[10px]" : "h-10 w-10 text-sm"
-      }`}
-    >
-      {persona.initials}
-    </span>
   );
 }
 
@@ -110,7 +91,6 @@ const OUTCOME_DOT: Record<Persona["outcome"], string> = {
 
 function PersonaCard({
   persona,
-  tone,
   tint,
   screens,
   expanded,
@@ -119,7 +99,6 @@ function PersonaCard({
   delay,
 }: {
   persona: Persona;
-  tone: string;
   tint: (typeof CARD_TINTS)[number];
   screens: Map<string, Screen>;
   expanded: boolean;
@@ -134,80 +113,71 @@ function PersonaCard({
 
   return (
     <div
-      className={`rise print-avoid-break flex flex-col overflow-hidden rounded-2xl border ${tint.border} ${tint.bg} shadow-[0_1px_2px_rgba(34,29,20,0.05)]`}
+      className={`rise print-avoid-break flex flex-col overflow-hidden rounded-2xl border ${tint.border} ${tint.bg}`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <button
-        onClick={onToggle}
-        aria-expanded={expanded}
-        className="flex-1 p-4 text-left sm:p-5"
-      >
-        {/* Tag row */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className={`rounded-full ${tint.chip} px-2 py-0.5 text-[11px] font-medium text-ink/70`}>
-            {persona.language}
-          </span>
-          <span className={`rounded-full ${tint.chip} px-2 py-0.5 text-[11px] font-medium text-ink/70`}>
-            {persona.connection}
-          </span>
-          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-white/70 px-2.5 py-1 text-[11.5px] font-medium text-ink/80">
+      <button onClick={onToggle} aria-expanded={expanded} className="flex-1 p-5 text-left sm:p-6">
+        {/* Header: name + quiet outcome */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="font-display text-[16px] font-semibold leading-snug text-ink">
+              {persona.name} <span className="font-normal text-ink/40">{persona.age}</span>
+            </h3>
+            <p className="mt-1 text-[11.5px] text-ink/50">
+              {persona.language} · {persona.connection}
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap pt-0.5 text-[11px] font-medium text-ink/55">
             <span className={`h-1.5 w-1.5 rounded-full ${OUTCOME_DOT[persona.outcome]}`} />
             {badge.label}
           </span>
         </div>
 
-        {/* Name */}
-        <h3 className="mt-3 font-display text-[19px] font-semibold leading-tight text-ink">
-          {persona.name} <span className="font-normal text-ink/50">{persona.age}</span>
-        </h3>
-        <p className="mt-0.5 text-[12.5px] text-ink/55">{persona.context.split("·")[0].trim()}</p>
-
         {/* Key moment */}
         {key && (
-          <div className="mt-3.5">
-            <p className="font-display text-[10.5px] font-semibold uppercase tracking-wider text-ink/50">
-              {persona.outcome === "dropped" ? "Where they quit" : "The sticking point"}
+          <div className="mt-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink/40">
+              {persona.outcome === "dropped" ? "Where they quit" : "Sticking point"}
               {keyScreen ? ` · ${keyScreen.label}` : ""}
             </p>
-            <p className="mt-1 text-[13.5px] leading-relaxed text-ink/80 line-clamp-3">{key.narrative}</p>
+            <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink/70 line-clamp-3">{key.narrative}</p>
           </div>
         )}
 
         {/* Footer */}
-        <div className={`mt-4 flex items-center gap-2 border-t ${tint.border} pt-3`}>
-          <Avatar persona={persona} tone={tone} small />
-          <span className="text-[12px] text-ink/55">
+        <div className={`mt-5 flex items-center border-t ${tint.line} pt-3 text-[11px] text-ink/45`}>
+          <span className="tabular-nums">
             {reached}/{persona.steps.length} screens
           </span>
-          <span className="no-print ml-auto text-[12px] font-medium text-ink/60">
-            {expanded ? "Hide walkthrough ▴" : "Full walkthrough ▾"}
+          <span className="no-print ml-auto font-medium text-ink/55">
+            {expanded ? "Hide walkthrough ▴" : "Walkthrough ▾"}
           </span>
         </div>
       </button>
 
       {expanded && (
-        <ol className="border-t border-white/50 bg-white/35 px-4 py-4 sm:px-5">
+        <ol className="border-t border-white/60 bg-white/40 px-5 py-4 sm:px-6">
           {persona.steps.map((step, i) => {
             const screen = screens.get(step.screen_id);
             const last = i === persona.steps.length - 1;
             return (
-              <li key={step.id} className="print-avoid-break relative flex gap-3 pb-5 last:pb-1 sm:gap-4">
+              <li key={step.id} className="print-avoid-break relative flex gap-3 pb-5 last:pb-1">
                 {!last && (
-                  <span className="absolute left-[13px] top-8 h-[calc(100%-2rem)] w-px bg-ink/10" aria-hidden />
+                  <span className="absolute left-3 top-7 h-[calc(100%-1.75rem)] w-px bg-ink/10" aria-hidden />
                 )}
                 <span
-                  className={`z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold tabular-nums ${STEP_DOT[step.status]}`}
+                  className={`z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold tabular-nums ${STEP_DOT[step.status]}`}
                 >
                   {step.position}
                 </span>
-                <div className="min-w-0 flex-1 pt-0.5">
+                <div className="min-w-0 flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="font-display text-[11px] font-semibold uppercase tracking-wider text-ink">
+                    <span className="font-display text-[10.5px] font-semibold uppercase tracking-wider text-ink">
                       {screen?.label ?? "Screen"}
                     </span>
                     <MetricTags step={step} persona={persona} />
                   </div>
-                  <p className="text-[13.5px] leading-relaxed text-ink-soft">{step.narrative}</p>
+                  <p className="text-[12.5px] leading-relaxed text-ink-soft">{step.narrative}</p>
                   {step.suggestion && <Suggestion text={step.suggestion} />}
                 </div>
               </li>
@@ -227,14 +197,12 @@ function PersonaCard({
 function ScreenSection({
   screen,
   report,
-  tones,
   tint,
   onAsk,
   delay,
 }: {
   screen: Screen;
   report: RunReport;
-  tones: Map<string, string>;
   tint: (typeof CARD_TINTS)[number];
   onAsk: (q: string) => void;
   delay: number;
@@ -253,46 +221,43 @@ function ScreenSection({
 
   return (
     <section
-      className={`rise print-avoid-break rounded-2xl border ${tint.border} ${tint.bg} p-4 shadow-[0_1px_2px_rgba(34,29,20,0.05)] sm:p-5`}
+      className={`rise print-avoid-break rounded-2xl border ${tint.border} ${tint.bg} p-5 sm:p-6`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="mb-2.5 flex items-baseline justify-between gap-3">
-        <h3 className="font-display text-lg font-semibold text-ink">
-          <span className="mr-2 text-ink/40">{screen.position}.</span>
+      <div className="mb-3 flex items-baseline justify-between gap-3">
+        <h3 className="font-display text-[16px] font-semibold text-ink">
+          <span className="mr-2 text-ink/35">{screen.position}.</span>
           {screen.label}
         </h3>
-        <span className="shrink-0 text-xs text-ink/60">
-          {count("dropped") > 0 && <span className="font-medium text-bad">{count("dropped")} left here · </span>}
+        <span className="shrink-0 text-[11px] text-ink/50">
+          {count("dropped") > 0 && <span className="font-medium text-bad">{count("dropped")} left · </span>}
           {count("friction") > 0 && <span className="font-medium text-warn">{count("friction")} struggled · </span>}
-          {unreached > 0 ? `${unreached} never reached` : `${rows.length} of ${report.personas.length} saw it`}
+          {unreached > 0 ? `${unreached} never reached` : `${rows.length}/${report.personas.length} saw it`}
         </span>
       </div>
-      <div className="mb-4 flex h-1.5 w-full gap-0.5 overflow-hidden rounded-full bg-white/50" aria-hidden>
+      <div className="mb-4 flex h-1 w-full gap-0.5 overflow-hidden rounded-full bg-white/60" aria-hidden>
         {segments.map((s, i) => (
           <span key={i} className={`${s.cls} h-full`} style={{ flexGrow: s.n }} />
         ))}
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-1.5">
         {rows.map(({ p, step }) => (
-          <li key={step.id} className="flex gap-2.5 rounded-xl bg-white/45 p-3">
-            <Avatar persona={p} tone={tones.get(p.id)!} small />
-            <div className="min-w-0 flex-1">
-              <p className="text-[13.5px] leading-relaxed">
-                <span className="mr-1.5 font-medium text-ink">{p.name.split(" ")[0]}</span>
-                <span
-                  className={`mr-1.5 inline-block h-2 w-2 rounded-full align-baseline ${
-                    step.status === "ok" ? "bg-ok/80" : step.status === "friction" ? "bg-warn/90" : "bg-bad/90"
-                  }`}
-                  aria-label={step.status}
-                />
-                <span className="text-ink/70">{step.narrative}</span>
-              </p>
-              {step.suggestion && <Suggestion text={step.suggestion} />}
-            </div>
+          <li key={step.id} className="rounded-xl bg-white/40 px-3.5 py-2.5">
+            <p className="text-[12.5px] leading-relaxed">
+              <span
+                className={`mr-2 inline-block h-1.5 w-1.5 rounded-full align-middle ${
+                  step.status === "ok" ? "bg-ok/80" : step.status === "friction" ? "bg-warn/90" : "bg-bad/90"
+                }`}
+                aria-label={step.status}
+              />
+              <span className="mr-1.5 font-medium text-ink">{p.name.split(" ")[0]}</span>
+              <span className="text-ink/65">{step.narrative}</span>
+            </p>
+            {step.suggestion && <Suggestion text={step.suggestion} />}
           </li>
         ))}
       </ul>
-      <div className={`mt-3 border-t ${tint.border} pt-3`}>
+      <div className={`mt-4 border-t ${tint.line} pt-3`}>
         <AskChips questions={screenQuestions(screen)} onAsk={onAsk} />
       </div>
     </section>
@@ -344,10 +309,6 @@ export default function ResultsView({
           OUTCOME_RANK[a.outcome] - OUTCOME_RANK[b.outcome] ||
           (a.dropped_at_screen ?? 99) - (b.dropped_at_screen ?? 99),
       ),
-    [report],
-  );
-  const tones = useMemo(
-    () => new Map(report.personas.map((p, i) => [p.id, AVATAR_TONES[i % AVATAR_TONES.length]])),
     [report],
   );
 
@@ -446,8 +407,8 @@ export default function ResultsView({
             timeZone: "UTC",
           })}
         </p>
-        <h1 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">{report.title}</h1>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">{report.description}</p>
+        <h1 className="font-display text-[26px] font-semibold leading-tight sm:text-[32px]">{report.title}</h1>
+        <p className="mt-3 max-w-2xl text-[14px] leading-relaxed text-ink-soft">{report.description}</p>
       </header>
 
       {/* Summary strip */}
@@ -571,7 +532,6 @@ export default function ResultsView({
             <PersonaCard
               key={p.id}
               persona={p}
-              tone={tones.get(p.id)!}
               tint={CARD_TINTS[i % CARD_TINTS.length]}
               screens={screens}
               expanded={expanded.has(p.id)}
@@ -588,7 +548,6 @@ export default function ResultsView({
               key={s.id}
               screen={s}
               report={report}
-              tones={tones}
               tint={CARD_TINTS[i % CARD_TINTS.length]}
               onAsk={(q) => askScreen(s, q)}
               delay={i * 60}
