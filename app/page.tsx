@@ -2,6 +2,76 @@ import Link from "next/link";
 
 const CORAL = "#e8704e";
 
+// ── Hand-drawn doodle accents ──────────────────────────────────────────────
+function Sparkle({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M12 0c1.1 8.2 2.7 9.9 12 12-9.3 2.1-10.9 3.8-12 12-1.1-8.2-2.7-9.9-12-12 9.3-2.1 10.9-3.8 12-12Z" />
+    </svg>
+  );
+}
+
+function Squiggle({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 90 16" className={className} fill="none" aria-hidden>
+      <path
+        d="M2 9c6-9 12-9 18 0s12 9 18 0 12-9 18 0 12 9 18 0"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function Floret({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M12 2c1 3.5 1 3.5 3.5 1.9C14 7.4 14 7.4 17.5 7c-2.6 2.5-2.6 2.5 0 5-3.5-.4-3.5-.4-2 3-2.5-2.6-2.5-2.6-5 0 1.5-3.4 1.5-3.4-2-3 2.6-2.5 2.6-2.5 0-5 3.5.4 3.5.4 2-3Z" />
+    </svg>
+  );
+}
+
+// ── Scrolling ribbon of the human variables Setu models ──
+const VARIABLES = [
+  "Language",
+  "Literacy",
+  "Connection speed",
+  "Shared phones",
+  "First smartphones",
+  "Proxy use",
+  "Data rationing",
+  "OTP to a relative",
+  "Payment fear",
+  "Device age",
+  "Screen habits",
+];
+
+function Marquee() {
+  const Row = () => (
+    <div className="flex shrink-0 items-center">
+      {VARIABLES.map((t) => (
+        <span key={t} className="flex items-center">
+          <span className="whitespace-nowrap px-6 font-serifd text-[19px] italic text-paper/95 sm:text-[22px]">
+            {t}
+          </span>
+          <Floret className="h-3 w-3 shrink-0 text-paper/40" />
+        </span>
+      ))}
+    </div>
+  );
+  return (
+    <div className="relative my-16 select-none sm:my-24" aria-hidden>
+      <div className="-rotate-[1.3deg] scale-x-[1.05] overflow-hidden bg-terra py-4 shadow-[0_12px_30px_rgba(140,51,18,0.14)]">
+        <div className="flex w-max animate-marquee">
+          <Row />
+          <Row />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // A framed, slightly-rotated illustration (paper border + soft shadow).
 function Frame({
   src,
@@ -87,6 +157,8 @@ export default function Home() {
 
           {/* Center column */}
           <div className="relative z-10 mx-auto max-w-xl text-center">
+            <Sparkle className="absolute -left-1 top-6 hidden h-5 w-5 text-terra/35 sm:block" />
+            <Sparkle className="absolute right-2 top-1 hidden h-3.5 w-3.5 text-terra/30 sm:block" />
             <p className="rise font-dm text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-soft">
               AI user testing for non-urban India
             </p>
@@ -101,8 +173,23 @@ export default function Home() {
               style={{ animationDelay: "120ms" }}
             >
               Setu helps you bridge the gap between your product and{" "}
-              <span className="italic" style={{ color: CORAL }}>
+              <span className="relative inline-block italic" style={{ color: CORAL }}>
                 Non-Urban India.
+                <svg
+                  className="absolute -bottom-2 left-0 w-full"
+                  viewBox="0 0 200 10"
+                  preserveAspectRatio="none"
+                  fill="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M2 6C34 2 60 2 92 5s70 3 106-2"
+                    stroke={CORAL}
+                    strokeOpacity="0.5"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </span>
             </p>
 
@@ -232,6 +319,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Variables ribbon ── */}
+      <Marquee />
+
       {/* ── The report peek (live card) ── */}
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
@@ -320,8 +410,14 @@ export default function Home() {
       </section>
 
       {/* ── The honest part (back cover) ── */}
-      <section className="bg-ink text-paper">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:py-24">
+      <section className="relative bg-ink text-paper">
+        {/* torn-paper top edge — the dark card looks ripped out of the page */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 -top-5 h-10 bg-ink"
+          style={{ filter: "url(#deckle)" }}
+        />
+        <div className="relative mx-auto max-w-3xl px-6 py-20 text-center sm:py-24">
           <p className="font-dm text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: CORAL }}>
             The honest part
           </p>
