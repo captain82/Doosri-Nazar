@@ -24,6 +24,9 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],
+        wordmark: ["var(--font-wordmark)", "Georgia", "serif"],
+        serifd: ["var(--font-serifd)", "Georgia", "serif"],
+        dm: ["var(--font-dm)", "system-ui", "sans-serif"],
       },
     },
   },
