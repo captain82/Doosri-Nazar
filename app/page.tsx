@@ -43,19 +43,19 @@ export default function Home() {
             <span className="italic text-terra">the people it&apos;s built for.</span>
           </h1>
           <p
-            className="rise mt-8 max-w-2xl text-[17px] leading-relaxed text-ink-soft"
-            style={{ animationDelay: "120ms" }}
+            className="rise mt-7 max-w-2xl text-[19px] font-medium leading-snug text-ink sm:text-[21px]"
+            style={{ animationDelay: "100ms" }}
+          >
+            Bridging the gap between the people who build India&apos;s public services — and the
+            people they&apos;re for.
+          </p>
+          <p
+            className="rise mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink-soft"
+            style={{ animationDelay: "150ms" }}
           >
             Doosri Nazar sends AI users grounded in non-urban India — 2G data, five languages, shared
             phones, first smartphones — through your screens, and shows you exactly where they fall
             off. Before it goes live.
-          </p>
-          <p
-            className="rise mt-4 max-w-2xl text-[17px] leading-relaxed text-ink"
-            style={{ animationDelay: "160ms" }}
-          >
-            The farmer on 2G, the widow on a borrowed phone, the elder who reads no English — designed
-            out of the very services built to reach them. Not deliberately. Invisibly.
           </p>
           <div className="rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: "200ms" }}>
             <Link
@@ -76,8 +76,7 @@ export default function Home() {
             className="rise mt-10 max-w-xl text-[13px] leading-relaxed text-ink-soft"
             style={{ animationDelay: "240ms" }}
           >
-            For the teams building India&apos;s public services — welfare, health, schemes, benefits —
-            for people who are nothing like the people who build them.
+            For the teams building India&apos;s public services — welfare, health, schemes, benefits.
           </p>
         </div>
       </section>
