@@ -85,6 +85,27 @@ Per-provider default models (both calls use the *strong* model on purpose — a 
 
 Both providers use structured-output JSON and image (vision) input; adding a third is one file in `lib/ai/`.
 
+## Model choices — what we optimized for cost vs. quality
+
+The two calls have very different economics, so they got different treatment.
+
+- **Persona generation** — *one* call per run (sees the first screen + description). Cheap.
+- **Walkthrough** — the expensive part: *one call per persona* (×5), each carrying the screenshots forward for vision. ~20 image-heavy calls per run. This is where the tokens *and* the value are, so it's where the trade-off is.
+
+**What we optimized for cost — the levers that don't touch quality:**
+
+- **Image downscaling** (`sharp`, both calls): screenshots are resized and WebP-encoded server-side before they ever reach the model — **~72% fewer image tokens** with no legibility loss. This is the single biggest cost win, and it's free.
+- **Parallel walks:** the five persona walks fire concurrently from the client, so ~20 calls finish in ~30s wall-clock instead of serially.
+- **Caching (Anthropic):** the walk carries screens forward, so we cache with *one moving `cache_control` breakpoint on the latest image* rather than re-paying to send the whole history every screen (and it stays under Anthropic's 4-breakpoint cap).
+- **Structured output + one retry:** malformed JSON is caught and retried once, not billed as a dozen wasted calls.
+
+**What we deliberately did *not* cheap out on — the lever that *does* hurt quality:**
+
+- **The walkthrough model.** We first split it for cost — strong model for personas, a *cheap* model (Haiku 4.5 / `gpt-4o-mini`) for the 20-call walk. The cheap walk produced blander, more **convergent** findings — the exact failure this product exists to avoid. We reverted: **both calls run the strong model.**
+- A/B on the real task (Aug 8): **Sonnet 5** was sharpest and most grounded, **gpt-4o** solid but slightly more generic, **Haiku 4.5** too generic for the walk. We shipped on **`gpt-4o` for both calls** (active provider is OpenAI), with the whole thing one env var away from Claude if we want to swap.
+
+**The rule we settled on:** optimize cost on the *plumbing* — images, parallelism, caching, retries — and **never on the model that produces the findings.** The walkthrough is the product; a cheaper model there saves cents and loses the whole point.
+
 ## Run it locally
 
 ```bash
