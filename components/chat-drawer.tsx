@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import type { ChatTurn } from "@/lib/ai/types";
+import Markdown from "@/components/markdown";
 
 export interface MsgScope {
   type: "user" | "screen";
@@ -200,8 +201,10 @@ export default function ChatDrawer({
               </div>
             ) : (
               <div key={i} className="flex justify-start">
-                <div className="max-w-[92%] whitespace-pre-wrap text-[14px] leading-relaxed text-ink">
-                  {m.text || (
+                <div className="max-w-[92%] text-[14px] leading-relaxed text-ink">
+                  {m.text ? (
+                    <Markdown text={m.text} />
+                  ) : (
                     <span className="inline-flex gap-1" aria-label="thinking">
                       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.3s]" />
                       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-soft [animation-delay:-0.15s]" />
