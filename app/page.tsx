@@ -199,11 +199,22 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Bottom: flow arrow */}
+            {/* Bottom: hand-drawn flow arrow */}
             <div className="mt-10 flex justify-center lg:mt-0 lg:pb-2">
-              <svg width="16" height="60" viewBox="0 0 16 60" fill="none" className="text-ink-soft/70" aria-hidden>
-                <line x1="8" y1="0" x2="8" y2="52" stroke="currentColor" strokeWidth="1.4" />
-                <path d="M2 46 L8 58 L14 46" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              <svg width="34" height="62" viewBox="0 0 34 62" fill="none" className="text-terra/50" aria-hidden>
+                <path
+                  d="M17 4C12.5 17 21.5 28 17 43"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                />
+                <path
+                  d="M9 37C12.4 43.6 15.2 47 17 47C18.8 47 21.6 43.6 25 37"
+                  stroke="currentColor"
+                  strokeWidth="2.1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
           </div>
