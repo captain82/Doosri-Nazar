@@ -91,7 +91,7 @@ export default function ChatDrawer({
       if (!acc) {
         setMessages((prev) => {
           const next = [...prev];
-          next[next.length - 1] = { role: "assistant", text: "Sorry — I couldn't answer that. Try again." };
+          next[next.length - 1] = { role: "assistant", text: "Sorry, I couldn't answer that. Try again." };
           return next;
         });
       }
@@ -107,7 +107,7 @@ export default function ChatDrawer({
     }
   };
 
-  // A tapped card/screen question arrives as a "pending" ask — send it once,
+  // A tapped card/screen question arrives as a "pending" ask, send it once,
   // then clear it so reopening the drawer doesn't re-ask.
   useEffect(() => {
     if (pending && pending.id !== handledPending.current) {
@@ -139,7 +139,7 @@ export default function ChatDrawer({
               Ask about this report
             </p>
             <p className="mt-0.5 text-[13px] text-ink-soft">
-              One conversation — tap a question on any user or screen, or type your own.
+              One conversation, tap a question on any user or screen, or type your own.
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">

@@ -63,7 +63,7 @@ export default function LoginForm({ next }: { next: string }) {
       >
         {busy ? "Sending…" : "Email me a sign-in link"}
       </button>
-      <p className="text-center text-[12px] text-ink-soft">No password, no account setup — the link is the login.</p>
+      <p className="text-center text-[12px] text-ink-soft">No password, no account setup, the link is the login.</p>
     </form>
   );
 }

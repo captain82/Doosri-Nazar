@@ -37,7 +37,7 @@ export default async function NewRunPage() {
           </h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
             Upload the screens in the order a user meets them. Five AI users from non-urban India
-            will walk through — on their phones, their connections, in their languages — and
+            will walk through, on their phones, their connections, in their languages, and
             report back.
           </p>
         </header>

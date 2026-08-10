@@ -140,7 +140,7 @@ export default function Home() {
       {/* ── Hero: illustration collage + wordmark + tagline ── */}
       <section className="relative overflow-hidden">
         <div className="relative mx-auto min-h-[36rem] max-w-6xl px-6 pb-8 pt-24 sm:min-h-[40rem] sm:pt-28 lg:min-h-[42rem]">
-          {/* Desktop collage — overlapping torn-paper pairs flanking the column */}
+          {/* Desktop collage, overlapping torn-paper pairs flanking the column */}
           <div className="pointer-events-none absolute inset-0 hidden select-none lg:block">
             {/* Top-left pair */}
             <Frame src="/il/h1.webp" w={160} r={-6} style={{ left: "2%", top: "36px" }} className="rise" />
@@ -245,7 +245,7 @@ export default function Home() {
               className="pointer-events-none absolute left-[16.6%] right-[16.6%] top-4 hidden border-t border-dashed border-terra/25 sm:block"
             />
 
-            {/* 1 — upload */}
+            {/* 1, upload */}
             <div className="relative flex flex-col items-center text-center">
               <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
                 1
@@ -262,7 +262,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* 2 — personas */}
+            {/* 2, personas */}
             <div className="relative flex flex-col items-center text-center">
               <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
                 2
@@ -283,12 +283,12 @@ export default function Home() {
               </div>
               <h3 className="mt-7 font-serifd text-[20px] text-ink">Meet the users</h3>
               <p className="mt-2 max-w-[18.5rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
-                AI personas grounded in non-urban India — 20+ variables like language, literacy and
-                network — walk each screen, one by one.
+                AI personas grounded in non-urban India, 20+ variables like language, literacy and
+                network, walk each screen, one by one.
               </p>
             </div>
 
-            {/* 3 — report */}
+            {/* 3, report */}
             <div className="relative flex flex-col items-center text-center">
               <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
                 3
@@ -327,7 +327,7 @@ export default function Home() {
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
           <h2 className="mx-auto max-w-2xl text-center font-serifd text-[28px] italic leading-[1.25] text-ink sm:text-[34px]">
-            You don&apos;t get a score. You get a person — and the moment they gave up.
+            You don&apos;t get a score. You get a person, and the moment they gave up.
           </h2>
 
           <div className="relative mx-auto mt-14 max-w-2xl">
@@ -384,8 +384,8 @@ export default function Home() {
                       </span>
                     </p>
                     <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-                      The doctor list is entirely in English — &ldquo;General Physician&rdquo;,
-                      &ldquo;Dermatology&rdquo; — with no Telugu anywhere and no language switch she
+                      The doctor list is entirely in English, &ldquo;General Physician&rdquo;,
+                      &ldquo;Dermatology&rdquo;, with no Telugu anywhere and no language switch she
                       could find. None of the words meant anything to her. She closed the app and
                       decided to phone her son instead.
                     </p>
@@ -395,7 +395,7 @@ export default function Home() {
                       </span>
                       <span className="text-[13px] leading-relaxed text-ink">
                         Ask for language on the first screen; translate specialty names into plain
-                        words — &ldquo;skin doctor&rdquo;, not &ldquo;Dermatology&rdquo;.
+                        words, &ldquo;skin doctor&rdquo;, not &ldquo;Dermatology&rdquo;.
                       </span>
                     </div>
                   </div>
@@ -412,7 +412,7 @@ export default function Home() {
 
       {/* ── The honest part (back cover) ── */}
       <section className="relative bg-ink text-paper">
-        {/* torn-paper top edge — the dark card looks ripped out of the page */}
+        {/* torn-paper top edge, the dark card looks ripped out of the page */}
         <div
           aria-hidden
           className="absolute inset-x-0 -top-5 h-10 bg-ink"

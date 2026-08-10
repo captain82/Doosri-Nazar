@@ -36,9 +36,9 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Setu — AI user testing for non-urban India",
+  title: "Setu: AI user testing for non-urban India",
   description:
-    "Upload a flow, and AI users grounded in non-urban India — throttled connections, shared phones, first smartphones, five languages — walk through it and tell you where it breaks.",
+    "Upload a flow, and AI users grounded in non-urban India, throttled connections, shared phones, first smartphones, five languages, walk through it and tell you where it breaks.",
 };
 
 export default function RootLayout({

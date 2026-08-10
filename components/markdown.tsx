@@ -3,8 +3,7 @@ import type { ReactNode } from "react";
 // Minimal, dependency-free Markdown → React renderer for chat/report text.
 // Handles what the model actually emits: **bold**, *italic*, `code`, bullet
 // and numbered lists, ### headings, and blank-line paragraphs. Builds React
-// nodes (no dangerouslySetInnerHTML) so it's XSS-safe and streaming-friendly —
-// an unclosed **…** mid-stream simply renders literally until it closes.
+// nodes (no dangerouslySetInnerHTML) so it's XSS-safe and streaming-friendly, // an unclosed **…** mid-stream simply renders literally until it closes.
 
 function inline(text: string, keyPrefix: string): ReactNode[] {
   const nodes: ReactNode[] = [];
@@ -109,7 +108,7 @@ export default function Markdown({ text, className = "" }: { text: string; class
       continue;
     }
 
-    // Paragraph — gather consecutive plain lines
+    // Paragraph, gather consecutive plain lines
     const para: string[] = [];
     while (
       i < lines.length &&

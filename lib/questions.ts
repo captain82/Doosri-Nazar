@@ -1,6 +1,6 @@
 import type { Persona, Screen } from "./types";
 
-// Outcome-aware suggested questions for one persona — templated (no model call),
+// Outcome-aware suggested questions for one persona, templated (no model call),
 // so they're instant and still feel tailored.
 export function userQuestions(p: Persona): string[] {
   const first = p.name.split(" ")[0];

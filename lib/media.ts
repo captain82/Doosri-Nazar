@@ -3,7 +3,7 @@ import sharp from "sharp";
 import type { AiImage } from "./ai/types";
 
 // Effective throughput in bytes/second. India is nominally on 4G/5G, but real
-// experienced speed varies — weak/congested signal, and a phone throttled to
+// experienced speed varies, weak/congested signal, and a phone throttled to
 // ~64kbps after the daily data pack runs out. Load time is COMPUTED from real
 // screenshot bytes and passed into the prompt as a fact, never generated.
 const THROUGHPUT: Record<string, number> = {
@@ -18,7 +18,7 @@ export function loadSeconds(bytes: number, connection: string): number {
   return Math.round((bytes / bps) * 10) / 10;
 }
 
-// Downscale a screenshot for the model: long edge to 1200px, JPEG q78 — ~72%
+// Downscale a screenshot for the model: long edge to 1200px, JPEG q78, ~72%
 // fewer image tokens than the original PNG with no legibility loss. The
 // ORIGINAL file stays in storage; load-time math uses its bytes, not this copy.
 async function downscale(buf: Buffer): Promise<string> {

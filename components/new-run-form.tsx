@@ -169,15 +169,14 @@ export default function NewRunForm() {
         <div className="flex items-center gap-2 text-[13px]">
           {inferFailed ? (
             <span className="text-ink-soft">
-              Couldn&apos;t auto-read the screens — add a name and description yourself, or just run it.
+              Couldn&apos;t auto-read the screens, add a name and description yourself, or just run it.
             </span>
           ) : category ? (
             <span className="text-ink-soft">
               We read your {screens.length} screen{screens.length > 1 ? "s" : ""}. Looks like{" "}
               <span className="rounded-full border border-line bg-card px-2 py-0.5 font-medium text-ink">
                 {category}
-              </span>{" "}
-              — edit anything below, or just run it.
+              </span>{" "}, edit anything below, or just run it.
             </span>
           ) : null}
         </div>
@@ -200,7 +199,7 @@ export default function NewRunForm() {
 
         <div>
           <label htmlFor="description" className="mb-1.5 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-            What this flow does <span className="font-normal normal-case tracking-normal text-ink-soft">— optional</span>
+            What this flow does <span className="font-normal normal-case tracking-normal text-ink-soft">(optional)</span>
           </label>
           <textarea
             id="description"
@@ -210,11 +209,11 @@ export default function NewRunForm() {
               setDescription(e.target.value);
             }}
             rows={4}
-            placeholder="We infer this from your screens — leave it or refine it."
+            placeholder="We infer this from your screens, leave it or refine it."
             className="w-full resize-y rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
           />
           <p className="mt-1.5 text-[12px] text-ink-soft">
-            Add anything we can&apos;t see — hidden rules, what happens after payment — to sharpen the report.
+            Add anything we can&apos;t see, hidden rules, what happens after payment, to sharpen the report.
           </p>
         </div>
 
@@ -313,7 +312,7 @@ export default function NewRunForm() {
                     onChange={(e) =>
                       setScreens((prev) => prev.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))
                     }
-                    placeholder={`Label (optional) — "Payment", "Documents"…`}
+                    placeholder={`Label (optional), "Payment", "Documents"…`}
                     className="w-full rounded border border-transparent bg-transparent px-1.5 py-1 text-sm outline-none transition-colors placeholder:text-ink-soft/60 focus:border-line focus:bg-paper"
                   />
                   <p className="mt-0.5 px-1.5 text-[11px] tabular-nums text-ink-soft">

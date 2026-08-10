@@ -17,7 +17,7 @@ const TONES = [
 
 const isComplete = (p: Persona) => p.outcome != null && p.steps?.length > 0;
 
-// Narrated status line shown while personas are being generated — mirrors the
+// Narrated status line shown while personas are being generated, mirrors the
 // real pipeline (read the flow → pick the constraints that matter → cast +
 // ground five users → give each a way they might fail). Advances on a timer
 // and holds on the last line until the roster arrives.
@@ -30,7 +30,7 @@ const PERSONA_STEPS = [
   "Bringing your five testers to life…",
 ];
 
-// Read a response safely — a platform-level error (timeout, crash) returns a
+// Read a response safely, a platform-level error (timeout, crash) returns a
 // plain-text body, so JSON.parse would throw the cryptic "Unexpected token"
 // error. Fall back to the raw text as a message instead.
 async function readBody(res: Response): Promise<Record<string, unknown>> {
@@ -65,7 +65,7 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
   const genStarted = useRef(false);
   const walkStarted = useRef(false);
 
-  // Screens in the order a user meets them — used to narrate the walkthrough.
+  // Screens in the order a user meets them, used to narrate the walkthrough.
   const orderedScreens = [...initial.screens].sort((a, b) => a.position - b.position);
 
   // Advance the narrated status line while generating; hold on the last one.
@@ -110,7 +110,7 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
     })();
   }, [phase, initial.id]);
 
-  // Walk the personas — kicked off by the button, or auto-resumed on reload.
+  // Walk the personas, kicked off by the button, or auto-resumed on reload.
   const startWalking = () => {
     if (walkStarted.current) return;
     walkStarted.current = true;
@@ -171,7 +171,7 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
               {PERSONA_STEPS[stepIdx]}
             </span>
           ) : phase === "review" ? (
-            "These are the people who'll walk your flow — each shaped by a different real constraint. Review them, then send them through your screens."
+            "These are the people who'll walk your flow, each shaped by a different real constraint. Review them, then send them through your screens."
           ) : (
             `${doneCount} of ${personas.length} have finished walking through your ${initial.screens.length} screens. Each appears the moment they're done.`
           )}
@@ -184,7 +184,7 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
         </div>
       )}
 
-      {/* Walk button — top of the review step so it's obvious */}
+      {/* Walk button, top of the review step so it's obvious */}
       {phase === "review" && (
         <div className="mb-5 flex flex-wrap items-center gap-3">
           <button
@@ -195,7 +195,7 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
             {initial.screens.length > 1 ? "s" : ""} →
           </button>
           <span className="text-[13px] text-ink-soft">
-            Five walkthroughs, one per user — takes about a minute.
+            Five walkthroughs, one per user, takes about a minute.
           </span>
         </div>
       )}

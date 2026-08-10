@@ -60,7 +60,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
           controller.enqueue(encoder.encode(chunk));
         }
       } catch {
-        controller.enqueue(encoder.encode("\n\n[Sorry — something went wrong answering that. Try again.]"));
+        controller.enqueue(encoder.encode("\n\n[Sorry, something went wrong answering that. Try again.]"));
       } finally {
         controller.close();
       }

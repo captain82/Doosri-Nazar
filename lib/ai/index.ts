@@ -17,7 +17,7 @@ export function getProvider(): AiProvider {
   return PROVIDERS[ACTIVE_PROVIDER];
 }
 
-// Per-call model choice. Both calls default to the STRONG model — the cheap
+// Per-call model choice. Both calls default to the STRONG model, the cheap
 // model on the walkthrough measurably hurt finding quality in real use. Drop
 // WALK_MODEL to a cheaper model (claude-haiku-4-5 / gpt-4o-mini) only if you
 // consciously want to trade quality for cost.

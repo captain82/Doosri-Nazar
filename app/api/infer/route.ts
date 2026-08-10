@@ -7,7 +7,7 @@ import { INFER_SYSTEM, INFER_SCHEMA, INFER_USER } from "@/lib/prompts";
 
 export const maxDuration = 60;
 
-// Read up to this many screens for the flow read-back — enough to understand
+// Read up to this many screens for the flow read-back, enough to understand
 // the flow without an unbounded token cost.
 const MAX_SCREENS = 6;
 

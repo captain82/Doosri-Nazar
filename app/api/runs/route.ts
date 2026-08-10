@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       width = dims.width ?? 0;
       height = dims.height ?? 0;
     } catch {
-      // not fatal — bytes are what the load-time computation needs
+      // not fatal, bytes are what the load-time computation needs
     }
 
     const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";

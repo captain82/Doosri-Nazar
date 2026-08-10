@@ -25,7 +25,7 @@ function AskChips({ questions, onAsk }: { questions: string[]; onAsk: (q: string
   );
 }
 
-// Soft pastel tints — a rotating, colourful set, kept quiet and low-contrast
+// Soft pastel tints, a rotating, colourful set, kept quiet and low-contrast
 // so the cards read as calm coloured fills rather than loud blocks.
 const CARD_TINTS = [
   { bg: "bg-[#F1F4E9]", border: "border-[#E3E8D2]", line: "border-[#DCE3C6]" }, // green
@@ -35,8 +35,8 @@ const CARD_TINTS = [
   { bg: "bg-[#EEF2F7]", border: "border-[#DFE6EF]", line: "border-[#D6E0EB]" }, // sky
 ];
 
-// The single most telling step for a persona — where they quit, else the
-// first friction, else their last step — used as the card's headline moment.
+// The single most telling step for a persona, where they quit, else the
+// first friction, else their last step, used as the card's headline moment.
 function keyStep(p: Persona): Step | undefined {
   return (
     p.steps.find((s) => s.status === "dropped") ??
@@ -135,7 +135,7 @@ function PersonaCard({
           </span>
         </div>
 
-        {/* Key moment — hidden when expanded, since the full walkthrough shows below */}
+        {/* Key moment, hidden when expanded, since the full walkthrough shows below */}
         {key && !expanded && (
           <div className="mt-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink/40">
@@ -336,7 +336,7 @@ export default function ResultsView({
     try {
       localStorage.setItem(storeKey, JSON.stringify(messages));
     } catch {
-      /* quota / private mode — chat just won't persist across reloads */
+      /* quota / private mode, chat just won't persist across reloads */
     }
   }, [storeKey, messages]);
 
@@ -503,7 +503,7 @@ export default function ResultsView({
                     className="block w-full px-3.5 py-2.5 text-left text-[13px] transition-colors hover:bg-paper"
                   >
                     <span className="font-medium">PDF</span>
-                    <span className="text-ink-soft"> — print / save</span>
+                    <span className="text-ink-soft"> · print / save</span>
                   </button>
                   <button
                     onClick={() => {
@@ -513,7 +513,7 @@ export default function ResultsView({
                     className="block w-full border-t border-line px-3.5 py-2.5 text-left text-[13px] transition-colors hover:bg-paper"
                   >
                     <span className="font-medium">Markdown</span>
-                    <span className="text-ink-soft"> — .md file</span>
+                    <span className="text-ink-soft"> · .md file</span>
                   </button>
                 </div>
               </>
