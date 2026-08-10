@@ -61,8 +61,12 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
   });
   const [error, setError] = useState<string | null>(null);
   const [stepIdx, setStepIdx] = useState(0);
+  const [walkTick, setWalkTick] = useState(0);
   const genStarted = useRef(false);
   const walkStarted = useRef(false);
+
+  // Screens in the order a user meets them — used to narrate the walkthrough.
+  const orderedScreens = [...initial.screens].sort((a, b) => a.position - b.position);
 
   // Advance the narrated status line while generating; hold on the last one.
   useEffect(() => {
@@ -70,6 +74,14 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
     const t = setInterval(() => {
       setStepIdx((i) => Math.min(i + 1, PERSONA_STEPS.length - 1));
     }, 2300);
+    return () => clearInterval(t);
+  }, [phase]);
+
+  // While walking, tick a shared clock; each card reads its "current screen"
+  // off it (staggered by index) so the roster cascades through the flow.
+  useEffect(() => {
+    if (phase !== "walking") return;
+    const t = setInterval(() => setWalkTick((n) => n + 1), 1700);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -238,10 +250,18 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
                   {badge.label}
                 </span>
               ) : phase === "walking" ? (
-                <span className="flex shrink-0 items-center gap-1.5 pt-0.5 text-xs text-ink-soft">
-                  <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
-                  walking…
-                </span>
+                (() => {
+                  const sIdx = Math.min(Math.max(walkTick - i, 0), orderedScreens.length - 1);
+                  const label = orderedScreens[sIdx]?.label ?? "your screens";
+                  return (
+                    <span className="flex shrink-0 items-center gap-1.5 pt-0.5 text-xs text-ink-soft">
+                      <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-terra" />
+                      <span key={sIdx} className="text-swap max-w-[9rem] truncate">
+                        on {label}…
+                      </span>
+                    </span>
+                  );
+                })()
               ) : null}
             </div>
           );
