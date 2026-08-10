@@ -17,6 +17,19 @@ const TONES = [
 
 const isComplete = (p: Persona) => p.outcome != null && p.steps?.length > 0;
 
+// Narrated status line shown while personas are being generated — mirrors the
+// real pipeline (read the flow → pick the constraints that matter → cast +
+// ground five users → give each a way they might fail). Advances on a timer
+// and holds on the last line until the roster arrives.
+const PERSONA_STEPS = [
+  "Reading your screens and what the flow is for…",
+  "Weighing which real-world constraints could trip it up…",
+  "Casting five users from across non-urban India…",
+  "Grounding each in a language, a device, a patchy connection…",
+  "Giving every tester a different reason they might get stuck…",
+  "Bringing your five testers to life…",
+];
+
 // Read a response safely — a platform-level error (timeout, crash) returns a
 // plain-text body, so JSON.parse would throw the cryptic "Unexpected token"
 // error. Fall back to the raw text as a message instead.
@@ -47,8 +60,18 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
     return initial.personas.some(isComplete) ? "walking" : "review";
   });
   const [error, setError] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(0);
   const genStarted = useRef(false);
   const walkStarted = useRef(false);
+
+  // Advance the narrated status line while generating; hold on the last one.
+  useEffect(() => {
+    if (phase !== "personas") return;
+    const t = setInterval(() => {
+      setStepIdx((i) => Math.min(i + 1, PERSONA_STEPS.length - 1));
+    }, 2300);
+    return () => clearInterval(t);
+  }, [phase]);
 
   // Generate personas once, if we don't have them yet.
   useEffect(() => {
@@ -131,11 +154,15 @@ export default function RunOrchestrator({ initial }: { initial: RunReport }) {
           {initial.title}
         </h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-          {phase === "personas"
-            ? "Generating five non-urban Indian users grounded in language, device, connection and prior experience…"
-            : phase === "review"
-              ? "These are the people who'll walk your flow — each shaped by a different real constraint. Review them, then send them through your screens."
-              : `${doneCount} of ${personas.length} have finished walking through your ${initial.screens.length} screens. Each appears the moment they're done.`}
+          {phase === "personas" ? (
+            <span key={stepIdx} className="text-swap inline-block">
+              {PERSONA_STEPS[stepIdx]}
+            </span>
+          ) : phase === "review" ? (
+            "These are the people who'll walk your flow — each shaped by a different real constraint. Review them, then send them through your screens."
+          ) : (
+            `${doneCount} of ${personas.length} have finished walking through your ${initial.screens.length} screens. Each appears the moment they're done.`
+          )}
         </p>
       </header>
 
