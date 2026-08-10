@@ -113,7 +113,9 @@ function PersonaCard({
 
   return (
     <div
-      className={`rise print-avoid-break flex flex-col overflow-hidden rounded-2xl border ${tint.border} ${tint.bg}`}
+      className={`rise print-avoid-break flex flex-col overflow-hidden rounded-2xl border ${tint.border} ${tint.bg} ${
+        expanded ? "sm:col-span-2" : ""
+      }`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <button onClick={onToggle} aria-expanded={expanded} className="flex-1 p-5 text-left sm:p-6">
@@ -133,8 +135,8 @@ function PersonaCard({
           </span>
         </div>
 
-        {/* Key moment */}
-        {key && (
+        {/* Key moment — hidden when expanded, since the full walkthrough shows below */}
+        {key && !expanded && (
           <div className="mt-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-ink/40">
               {persona.outcome === "dropped" ? "Where they quit" : "Sticking point"}
