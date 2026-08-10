@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { SAMPLES, type Sample } from "@/lib/samples";
 
 interface Draft {
   id: string;
@@ -29,6 +30,8 @@ export default function NewRunForm() {
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [loadingSample, setLoadingSample] = useState<string | null>(null);
+  const [fromSample, setFromSample] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const titleTouched = useRef(false);
   const descTouched = useRef(false);
@@ -36,6 +39,7 @@ export default function NewRunForm() {
 
   const addFiles = (list: FileList | null) => {
     if (!list) return;
+    setFromSample(false);
     Array.from(list)
       .filter((f) => f.type.startsWith("image/"))
       .forEach((file) => {
@@ -110,6 +114,44 @@ export default function NewRunForm() {
     }
   };
 
+  // Load a ready-made sample: fetch its mock screenshots as files, prefill the
+  // curated title/description/category, then jump straight to the run step
+  // (no "read your screens" call needed).
+  const loadSample = async (s: Sample) => {
+    if (loadingSample) return;
+    setLoadingSample(s.id);
+    setNotice(null);
+    try {
+      const drafts: Draft[] = await Promise.all(
+        s.screens.map(async (sc, i) => {
+          const blob = await (await fetch(sc.src)).blob();
+          const file = new File([blob], `${s.id}-${i + 1}.png`, { type: "image/png" });
+          const url = URL.createObjectURL(blob);
+          const dim = await new Promise<{ w: number; h: number }>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+            img.onerror = () => resolve({ w: 390, h: 844 });
+            img.src = url;
+          });
+          return { id: `${s.id}-${i}`, file, url, label: sc.label, width: dim.w, height: dim.h };
+        }),
+      );
+      setScreens(drafts);
+      setTitle(s.title);
+      setDescription(s.description);
+      setCategory(s.category);
+      titleTouched.current = true;
+      descTouched.current = true;
+      readKey.current = drafts.map((d) => d.id).join(",");
+      setFromSample(true);
+      setPhase("details");
+    } catch {
+      setNotice("Could not load the sample. Please try again.");
+    } finally {
+      setLoadingSample(null);
+    }
+  };
+
   const submit = async () => {
     setSubmitting(true);
     setNotice(null);
@@ -167,7 +209,12 @@ export default function NewRunForm() {
         </button>
 
         <div className="flex items-center gap-2 text-[13px]">
-          {inferFailed ? (
+          {fromSample ? (
+            <span className="text-ink-soft">
+              Sample flow loaded, {screens.length} screen{screens.length > 1 ? "s" : ""}. Just run it below, or
+              tweak the details first.
+            </span>
+          ) : inferFailed ? (
             <span className="text-ink-soft">
               Couldn&apos;t auto-read the screens, add a name and description yourself, or just run it.
             </span>
@@ -339,6 +386,49 @@ export default function NewRunForm() {
       </button>
       {!hasScreens && (
         <p className="text-[12px] text-ink-soft">Add your screenshots first, then we&apos;ll read them for you.</p>
+      )}
+
+      {/* No screenshots handy? Run a ready-made sample flow. */}
+      {!hasScreens && (
+        <div className="pt-4">
+          <div className="flex items-center gap-3 pb-5">
+            <span className="h-px flex-1 bg-line" />
+            <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
+              or
+            </span>
+            <span className="h-px flex-1 bg-line" />
+          </div>
+          <p className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
+            No screenshots? Start from a sample
+          </p>
+          <p className="mt-1.5 text-[13px] text-ink-soft">
+            Pick a ready-made flow and watch five non-urban users try it. No upload needed.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {SAMPLES.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => loadSample(s)}
+                disabled={loadingSample !== null}
+                className="group flex items-center gap-3 rounded-xl border border-line bg-card p-3.5 text-left transition-colors hover:border-ink-soft disabled:cursor-wait disabled:opacity-60"
+              >
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl"
+                  style={{ backgroundColor: `${s.accent}1a` }}
+                >
+                  {s.emoji}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-medium text-ink">{s.label}</span>
+                  <span className="block truncate text-[12px] text-ink-soft">{s.blurb}</span>
+                </span>
+                <span className="shrink-0 text-[13px] font-medium text-ink-soft transition-colors group-hover:text-ink">
+                  {loadingSample === s.id ? <span className="text-[12px]">Loading…</span> : "→"}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
