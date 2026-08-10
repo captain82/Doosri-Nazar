@@ -281,11 +281,8 @@ export default function NewRunForm() {
 
   // ── Upload (arrange all screens) ────────────────────────────────────
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <section>
-        <label className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-          Screens, in the order users see them
-        </label>
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -301,17 +298,17 @@ export default function NewRunForm() {
           role="button"
           tabIndex={0}
           onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed text-center transition-colors ${
-            hasScreens ? "px-6 py-6" : "px-6 py-14"
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed text-center transition-colors ${
+            hasScreens ? "px-6 py-5" : "px-6 py-8"
           } ${dragOver ? "border-terra bg-terra-tint" : "border-line bg-card hover:border-ink-soft"}`}
         >
           <p className="font-medium">
-            {hasScreens ? "Add another screen" : "Drop your screenshots here"}
+            {hasScreens ? "Add another screen" : "Drop your screenshots, in order"}
           </p>
           <p className="mt-1 text-[13px] text-ink-soft">
             {hasScreens
               ? "PNG or JPG · order matters, rearrange below"
-              : "or paste (⌘V), or click to choose · PNG or JPG, one per screen"}
+              : "paste (⌘V) or click · PNG or JPG"}
           </p>
           <input
             ref={inputRef}
@@ -377,34 +374,26 @@ export default function NewRunForm() {
         )}
       </section>
 
-      <button
-        onClick={next}
-        disabled={!hasScreens}
-        className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
-      >
-        Next →
-      </button>
-      {!hasScreens && (
-        <p className="text-[12px] text-ink-soft">Add your screenshots first, then we&apos;ll read them for you.</p>
+      {hasScreens && (
+        <button
+          onClick={next}
+          className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep sm:w-auto"
+        >
+          Next →
+        </button>
       )}
 
       {/* No screenshots handy? Run a ready-made sample flow. */}
       {!hasScreens && (
-        <div className="pt-4">
-          <div className="flex items-center gap-3 pb-5">
+        <div className="pt-1">
+          <div className="mb-4 flex items-center gap-3">
             <span className="h-px flex-1 bg-line" />
             <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
-              or
+              or try a sample
             </span>
             <span className="h-px flex-1 bg-line" />
           </div>
-          <p className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-            No screenshots? Start from a sample
-          </p>
-          <p className="mt-1.5 text-[13px] text-ink-soft">
-            Pick a ready-made flow and watch five non-urban users try it. No upload needed.
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {SAMPLES.map((s) => (
               <button
                 key={s.id}

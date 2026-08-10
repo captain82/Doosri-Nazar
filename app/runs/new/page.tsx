@@ -28,17 +28,13 @@ export default async function NewRunPage() {
       </nav>
 
       <div className="mx-auto w-full max-w-3xl px-4 pb-24 sm:px-6">
-        <header className="pb-8 pt-10 sm:pt-14">
-          <p className="mb-2 font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-terra">
-            New run
-          </p>
+        <header className="pb-7 pt-10 sm:pt-14">
           <h1 className="font-display text-3xl font-semibold leading-tight sm:text-4xl">
             Show us the flow
           </h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">
-            Upload the screens in the order a user meets them. Five AI users from non-urban India
-            will walk through, on their phones, their connections, in their languages, and
-            report back.
+          <p className="mt-2.5 max-w-xl text-[15px] leading-relaxed text-ink-soft">
+            Upload your screens in order. Five AI users from non-urban India walk through and report
+            where they get stuck.
           </p>
         </header>
         <NewRunForm />
