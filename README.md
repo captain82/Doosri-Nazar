@@ -2,7 +2,7 @@
 
 **A bridge between the people who build India's public services and the people they're for.**
 
-Live: **https://setu-app.vercel.app** · Sample report: [/runs/demo](https://setu-app.vercel.app/runs/demo)
+Live: **https://setu-hq.vercel.app** · Sample report: [/runs/demo](https://setu-hq.vercel.app/runs/demo)
 
 ## The problem
 
