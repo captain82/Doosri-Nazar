@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { supabaseServer } from "@/lib/supabase/server";
 
 const CORAL = "#e8704e";
 
@@ -108,7 +109,11 @@ function Strip({ src }: { src: string }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const {
+    data: { user },
+  } = await supabaseServer().auth.getUser();
+
   return (
     <main className="min-h-screen overflow-x-hidden">
       {/* Torn-paper / deckle edge for illustration frames */}
@@ -122,10 +127,10 @@ export default function Home() {
       <nav className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-5 px-6 py-4 text-[13px] font-dm">
           <Link
-            href="/login"
+            href={user ? "/runs/new" : "/login"}
             className="rounded-full border border-line bg-card/70 px-3.5 py-1.5 backdrop-blur-sm transition-colors hover:border-ink-soft"
           >
-            Sign in
+            {user ? "New run" : "Sign in"}
           </Link>
         </div>
       </nav>
