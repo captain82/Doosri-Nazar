@@ -410,21 +410,39 @@ export default function NewRunForm() {
                 key={s.id}
                 onClick={() => loadSample(s)}
                 disabled={loadingSample !== null}
-                className="group flex items-center gap-3 rounded-xl border border-line bg-card p-3.5 text-left transition-colors hover:border-ink-soft disabled:cursor-wait disabled:opacity-60"
+                className="group flex flex-col rounded-xl border border-line bg-card p-3.5 text-left transition-colors hover:border-ink-soft disabled:cursor-wait disabled:opacity-60"
               >
-                <span
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl"
-                  style={{ backgroundColor: `${s.accent}1a` }}
-                >
-                  {s.emoji}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-medium text-ink">{s.label}</span>
-                  <span className="block truncate text-[12px] text-ink-soft">{s.blurb}</span>
-                </span>
-                <span className="shrink-0 text-[13px] font-medium text-ink-soft transition-colors group-hover:text-ink">
-                  {loadingSample === s.id ? <span className="text-[12px]">Loading…</span> : "→"}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xl"
+                    style={{ backgroundColor: `${s.accent}1a` }}
+                  >
+                    {s.emoji}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[14px] font-medium text-ink">{s.label}</span>
+                    <span className="block truncate text-[12px] text-ink-soft">{s.blurb}</span>
+                  </span>
+                  <span className="shrink-0 text-[13px] font-medium text-ink-soft transition-colors group-hover:text-ink">
+                    {loadingSample === s.id ? <span className="text-[12px]">Loading…</span> : "→"}
+                  </span>
+                </div>
+                {/* the actual screens this sample will test */}
+                <div className="mt-3 flex items-end gap-1.5">
+                  {s.screens.map((sc, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={i}
+                      src={sc.src}
+                      alt={sc.label}
+                      loading="lazy"
+                      className="h-[72px] w-auto rounded-md border border-line bg-white object-cover object-top shadow-sm"
+                    />
+                  ))}
+                  <span className="ml-auto self-center text-[11px] text-ink-soft">
+                    {s.screens.length} screens
+                  </span>
+                </div>
               </button>
             ))}
           </div>
