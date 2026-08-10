@@ -158,27 +158,12 @@ export default function Home() {
               Setu <span className="font-dm text-[15px] not-italic tracking-normal text-ink-soft">सेतु</span>
             </p>
             <p
-              className="rise mx-auto mt-8 max-w-md font-serifd text-[26px] leading-[1.25] text-ink sm:text-[32px]"
+              className="rise mx-auto mt-8 max-w-xl font-dm text-[23px] font-semibold leading-[1.32] tracking-[-0.01em] text-ink sm:text-[28px]"
               style={{ animationDelay: "120ms" }}
             >
               Setu helps you bridge the gap between your product and{" "}
-              <span className="relative inline-block italic" style={{ color: CORAL }}>
+              <span className="whitespace-nowrap" style={{ color: CORAL }}>
                 Non-Urban India.
-                <svg
-                  className="absolute -bottom-2 left-0 w-full"
-                  viewBox="0 0 200 10"
-                  preserveAspectRatio="none"
-                  fill="none"
-                  aria-hidden
-                >
-                  <path
-                    d="M2 6C34 2 60 2 92 5s70 3 106-2"
-                    stroke={CORAL}
-                    strokeOpacity="0.5"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                  />
-                </svg>
               </span>
             </p>
 
