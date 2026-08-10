@@ -121,9 +121,6 @@ export default function Home() {
       {/* ── Minimal top bar (the wordmark below is the brand) ── */}
       <nav className="absolute inset-x-0 top-0 z-20">
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-5 px-6 py-4 text-[13px] font-dm">
-          <Link href="/runs/demo" className="hidden text-ink-soft transition-colors hover:text-ink sm:inline">
-            Sample report
-          </Link>
           <Link
             href="/login"
             className="rounded-full border border-line bg-card/70 px-3.5 py-1.5 backdrop-blur-sm transition-colors hover:border-ink-soft"
@@ -178,15 +175,9 @@ export default function Home() {
               <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "180ms" }}>
                 <Link
                   href="/runs/new"
-                  className="rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-paper transition-colors hover:bg-terra-deep"
+                  className="rounded-full bg-ink px-6 py-2.5 text-[14px] font-medium text-paper transition-colors hover:bg-terra-deep"
                 >
-                  Test your flow
-                </Link>
-                <Link
-                  href="/runs/demo"
-                  className="rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:border-ink-soft"
-                >
-                  Read a sample report
+                  Test your flow →
                 </Link>
               </div>
 
@@ -424,10 +415,10 @@ export default function Home() {
             have is spent on what only real people can tell you.
           </p>
           <Link
-            href="/runs/demo"
+            href="/runs/new"
             className="group mt-9 inline-block rounded-full bg-paper px-5 py-2.5 text-[14px] font-medium text-ink transition-colors hover:bg-terra-tint"
           >
-            Read a sample field report{" "}
+            Test your flow{" "}
             <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
           </Link>
         </div>

@@ -19,9 +19,6 @@ export default async function NewRunPage() {
             Setu <span className="ml-1 text-sm font-normal text-ink-soft">सेतु</span>
           </Link>
           <div className="flex items-center gap-3">
-            <Link href="/runs/demo" className="text-[13px] text-ink-soft hover:text-ink">
-              Sample report
-            </Link>
             <UserChip email={user.email ?? ""} />
           </div>
         </div>
