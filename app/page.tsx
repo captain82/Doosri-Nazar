@@ -72,8 +72,9 @@ function Marquee() {
   );
 }
 
-// A framed, slightly-rotated illustration (paper border + soft shadow).
-function Frame({
+// A pre-grouped illustration cluster (transparent PNG, torn edges already
+// baked in) — just placed with a soft shadow that follows the silhouette.
+function GroupImg({
   src,
   w,
   r,
@@ -88,13 +89,8 @@ function Frame({
 }) {
   return (
     <div className={`absolute ${className}`} style={{ ...style, width: w, transform: `rotate(${r}deg)` }} aria-hidden>
-      <div
-        className="border-[6px] border-paper bg-paper"
-        style={{ filter: "url(#deckle) drop-shadow(0 11px 22px rgba(34,29,20,0.18))" }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt="" className="block w-full object-cover" />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="block w-full" />
     </div>
   );
 }
@@ -140,19 +136,12 @@ export default function Home() {
       {/* ── Hero: illustration collage + wordmark + tagline ── */}
       <section className="relative overflow-hidden">
         <div className="relative mx-auto min-h-[36rem] max-w-6xl px-6 pb-8 pt-24 sm:min-h-[40rem] sm:pt-28 lg:min-h-[42rem]">
-          {/* Desktop collage, overlapping torn-paper pairs flanking the column */}
+          {/* Desktop collage, pre-grouped illustration clusters flanking the column */}
           <div className="pointer-events-none absolute inset-0 hidden select-none lg:block">
-            {/* Top-left pair */}
-            <Frame src="/il/h1.webp" w={160} r={-6} style={{ left: "2%", top: "36px" }} className="rise" />
-            <Frame src="/il/h2.webp" w={146} r={5} style={{ left: "10%", top: "205px" }} className="rise" />
-            {/* Mid-left pair */}
-            <Frame src="/il/h5.webp" w={135} r={-8} style={{ left: "3%", top: "330px" }} className="rise" />
-            <Frame src="/il/h6.webp" w={160} r={3} style={{ left: "11%", top: "440px" }} className="rise" />
-            {/* Top-right pair */}
-            <Frame src="/il/h4.webp" w={162} r={-5} style={{ right: "8%", top: "150px" }} className="rise" />
-            <Frame src="/il/h3.webp" w={148} r={6} style={{ right: "2%", top: "245px" }} className="rise" />
-            {/* Lower-right single */}
-            <Frame src="/il/h7.webp" w={158} r={4} style={{ right: "4%", top: "430px" }} className="rise" />
+            <GroupImg src="/il/g1.webp" w={266} r={-1} style={{ left: "1%", top: "40px" }} className="rise" />
+            <GroupImg src="/il/g2.webp" w={244} r={1} style={{ right: "2%", top: "150px" }} className="rise" />
+            <GroupImg src="/il/g3.webp" w={244} r={-1} style={{ left: "2%", top: "420px" }} className="rise" />
+            <GroupImg src="/il/g4.webp" w={140} r={2} style={{ right: "8%", top: "460px" }} className="rise" />
           </div>
 
           {/* Center column */}
