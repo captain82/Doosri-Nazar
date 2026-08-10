@@ -144,54 +144,63 @@ export default function Home() {
             <GroupImg src="/il/g4.webp" w={140} r={2} style={{ right: "8%", top: "460px" }} className="rise" />
           </div>
 
-          {/* Center column */}
-          <div className="relative z-10 mx-auto max-w-xl text-center">
+          {/* Center column — wordmark on top, tagline centered between the
+              image rows, arrow at the bottom (desktop). */}
+          <div className="relative z-10 mx-auto max-w-xl text-center lg:flex lg:min-h-[34rem] lg:flex-col">
             <Sparkle className="absolute -left-1 top-6 hidden h-5 w-5 text-terra/35 sm:block" />
             <Sparkle className="absolute right-2 top-1 hidden h-3.5 w-3.5 text-terra/30 sm:block" />
-            <p className="rise font-dm text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-soft">
-              AI user testing for non-urban India
-            </p>
-            <p
-              className="rise mt-3 font-wordmark text-[54px] italic leading-none sm:text-[74px]"
-              style={{ color: CORAL, animationDelay: "60ms" }}
-            >
-              Setu <span className="font-dm text-[15px] not-italic tracking-normal text-ink-soft">सेतु</span>
-            </p>
-            <p
-              className="rise mx-auto mt-7 max-w-lg font-dm text-[19px] font-semibold leading-[1.35] tracking-[-0.01em] text-ink sm:text-[23px]"
-              style={{ animationDelay: "120ms" }}
-            >
-              Setu helps you bridge the gap between your product and{" "}
-              <span className="whitespace-nowrap" style={{ color: CORAL }}>
-                Non-Urban India.
-              </span>
-            </p>
 
-            <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "180ms" }}>
-              <Link
-                href="/runs/new"
-                className="rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-paper transition-colors hover:bg-terra-deep"
+            {/* Top: kicker + wordmark */}
+            <div>
+              <p className="rise font-dm text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-soft">
+                AI user testing for non-urban India
+              </p>
+              <p
+                className="rise mt-3 font-wordmark text-[54px] italic leading-none sm:text-[74px]"
+                style={{ color: CORAL, animationDelay: "60ms" }}
               >
-                Test your flow
-              </Link>
-              <Link
-                href="/runs/demo"
-                className="rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:border-ink-soft"
-              >
-                Read a sample report
-              </Link>
+                Setu <span className="font-dm text-[15px] not-italic tracking-normal text-ink-soft">सेतु</span>
+              </p>
             </div>
 
-            {/* Mobile illustration strip */}
-            <div className="mt-10 flex justify-center gap-3 overflow-hidden lg:hidden">
-              <Strip src="/il/h1.webp" />
-              <Strip src="/il/h3.webp" />
-              <Strip src="/il/h6.webp" />
-              <Strip src="/il/h7.webp" />
+            {/* Middle: tagline + CTAs, vertically centered on desktop */}
+            <div className="lg:flex lg:flex-1 lg:flex-col lg:items-center lg:justify-center">
+              <p
+                className="rise mt-7 w-full max-w-lg font-dm text-[19px] font-semibold leading-[1.35] tracking-[-0.01em] text-ink sm:text-[23px] lg:mt-0"
+                style={{ animationDelay: "120ms" }}
+              >
+                Setu helps you bridge the gap between your product and{" "}
+                <span className="whitespace-nowrap" style={{ color: CORAL }}>
+                  Non-Urban India.
+                </span>
+              </p>
+
+              <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "180ms" }}>
+                <Link
+                  href="/runs/new"
+                  className="rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-paper transition-colors hover:bg-terra-deep"
+                >
+                  Test your flow
+                </Link>
+                <Link
+                  href="/runs/demo"
+                  className="rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:border-ink-soft"
+                >
+                  Read a sample report
+                </Link>
+              </div>
+
+              {/* Mobile illustration strip */}
+              <div className="mt-10 flex justify-center gap-3 overflow-hidden lg:hidden">
+                <Strip src="/il/h1.webp" />
+                <Strip src="/il/h3.webp" />
+                <Strip src="/il/h6.webp" />
+                <Strip src="/il/h7.webp" />
+              </div>
             </div>
 
-            {/* Flow arrow */}
-            <div className="mt-10 flex justify-center">
+            {/* Bottom: flow arrow */}
+            <div className="mt-10 flex justify-center lg:mt-0 lg:pb-2">
               <svg width="16" height="60" viewBox="0 0 16 60" fill="none" className="text-ink-soft/70" aria-hidden>
                 <line x1="8" y1="0" x2="8" y2="52" stroke="currentColor" strokeWidth="1.4" />
                 <path d="M2 46 L8 58 L14 46" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
