@@ -52,7 +52,7 @@ function Marquee() {
     <div className="flex shrink-0 items-center">
       {VARIABLES.map((t) => (
         <span key={t} className="flex items-center">
-          <span className="whitespace-nowrap px-6 font-serifd text-[19px] italic text-paper/95 sm:text-[22px]">
+          <span className="whitespace-nowrap px-6 font-serifd text-[16px] italic text-paper/95 sm:text-[18px]">
             {t}
           </span>
           <Floret className="h-3 w-3 shrink-0 text-paper/40" />
@@ -152,13 +152,13 @@ export default function Home() {
               AI user testing for non-urban India
             </p>
             <p
-              className="rise mt-3 font-wordmark text-[68px] italic leading-none sm:text-[92px]"
+              className="rise mt-3 font-wordmark text-[54px] italic leading-none sm:text-[74px]"
               style={{ color: CORAL, animationDelay: "60ms" }}
             >
               Setu <span className="font-dm text-[15px] not-italic tracking-normal text-ink-soft">सेतु</span>
             </p>
             <p
-              className="rise mx-auto mt-8 max-w-xl font-dm text-[23px] font-semibold leading-[1.32] tracking-[-0.01em] text-ink sm:text-[28px]"
+              className="rise mx-auto mt-7 max-w-lg font-dm text-[19px] font-semibold leading-[1.35] tracking-[-0.01em] text-ink sm:text-[23px]"
               style={{ animationDelay: "120ms" }}
             >
               Setu helps you bridge the gap between your product and{" "}
@@ -170,13 +170,13 @@ export default function Home() {
             <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ animationDelay: "180ms" }}>
               <Link
                 href="/runs/new"
-                className="rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep"
+                className="rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-paper transition-colors hover:bg-terra-deep"
               >
                 Test your flow
               </Link>
               <Link
                 href="/runs/demo"
-                className="rounded-full border border-line bg-card px-6 py-3 text-[15px] font-medium transition-colors hover:border-ink-soft"
+                className="rounded-full border border-line bg-card px-5 py-2.5 text-[14px] font-medium transition-colors hover:border-ink-soft"
               >
                 Read a sample report
               </Link>
@@ -208,7 +208,7 @@ export default function Home() {
             <p className="font-dm text-[11px] font-semibold uppercase tracking-[0.24em] text-ink-soft">
               Three steps
             </p>
-            <h2 className="mt-3 font-serifd text-[32px] italic text-ink sm:text-[38px]">How it works?</h2>
+            <h2 className="mt-3 font-serifd text-[26px] italic text-ink sm:text-[30px]">How it works?</h2>
             <Squiggle className="mx-auto mt-3 h-3 w-24 text-terra/45" />
           </div>
 
@@ -221,7 +221,7 @@ export default function Home() {
 
             {/* 1, upload */}
             <div className="relative flex flex-col items-center text-center">
-              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[14px] italic text-terra">
                 1
               </span>
               <div className="mt-9 flex h-32 items-center justify-center">
@@ -230,15 +230,15 @@ export default function Home() {
                   <img src="/il/upload.svg" alt="" className="h-7 w-7 opacity-60" />
                 </div>
               </div>
-              <h3 className="mt-7 font-serifd text-[20px] text-ink">Upload the flow</h3>
-              <p className="mt-2 max-w-[16rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+              <h3 className="mt-6 font-serifd text-[18px] text-ink">Upload the flow</h3>
+              <p className="mt-2 max-w-[16rem] font-dm text-[13px] leading-relaxed text-ink-soft">
                 Add your app screenshots, in the order a citizen meets them.
               </p>
             </div>
 
             {/* 2, personas */}
             <div className="relative flex flex-col items-center text-center">
-              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[14px] italic text-terra">
                 2
               </span>
               <div className="mt-9 flex h-32 items-center justify-center">
@@ -255,8 +255,8 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-              <h3 className="mt-7 font-serifd text-[20px] text-ink">Meet the users</h3>
-              <p className="mt-2 max-w-[18.5rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+              <h3 className="mt-6 font-serifd text-[18px] text-ink">Meet the users</h3>
+              <p className="mt-2 max-w-[18.5rem] font-dm text-[13px] leading-relaxed text-ink-soft">
                 AI personas grounded in non-urban India, 20+ variables like language, literacy and
                 network, walk each screen, one by one.
               </p>
@@ -264,7 +264,7 @@ export default function Home() {
 
             {/* 3, report */}
             <div className="relative flex flex-col items-center text-center">
-              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[16px] italic text-terra">
+              <span className="relative z-10 inline-flex h-8 w-8 items-center justify-center rounded-full border border-terra/40 bg-paper font-serifd text-[14px] italic text-terra">
                 3
               </span>
               <div className="mt-9 flex h-32 items-center justify-center">
@@ -285,8 +285,8 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <h3 className="mt-7 font-serifd text-[20px] text-ink">Read the field report</h3>
-              <p className="mt-2 max-w-[16.5rem] font-dm text-[14.5px] leading-relaxed text-ink-soft">
+              <h3 className="mt-6 font-serifd text-[18px] text-ink">Read the field report</h3>
+              <p className="mt-2 max-w-[16.5rem] font-dm text-[13px] leading-relaxed text-ink-soft">
                 See who got stuck, on which screen, and the moment they gave up.
               </p>
             </div>
@@ -300,7 +300,7 @@ export default function Home() {
       {/* ── The report peek (live card) ── */}
       <section>
         <div className="mx-auto max-w-6xl px-6 py-20 sm:py-24">
-          <h2 className="mx-auto max-w-2xl text-center font-serifd text-[28px] italic leading-[1.25] text-ink sm:text-[34px]">
+          <h2 className="mx-auto max-w-2xl text-center font-serifd text-[23px] italic leading-[1.3] text-ink sm:text-[28px]">
             You don&apos;t get a score. You get a person, and the moment they gave up.
           </h2>
 
@@ -396,16 +396,16 @@ export default function Home() {
           <p className="font-dm text-[11px] font-semibold uppercase tracking-[0.2em]" style={{ color: CORAL }}>
             The honest part
           </p>
-          <h2 className="mt-5 font-serifd text-[30px] leading-tight sm:text-[38px]">
+          <h2 className="mt-5 font-serifd text-[25px] leading-tight sm:text-[31px]">
             This does not replace going to the village and watching someone use your app.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl font-dm text-[16px] leading-relaxed text-paper/70">
+          <p className="mx-auto mt-5 max-w-xl font-dm text-[14.5px] leading-relaxed text-paper/70">
             It&apos;s the cheap first pass. It clears the obvious breaks, so the real field time you
             have is spent on what only real people can tell you.
           </p>
           <Link
             href="/runs/demo"
-            className="group mt-9 inline-block rounded-full bg-paper px-6 py-3 text-[15px] font-medium text-ink transition-colors hover:bg-terra-tint"
+            className="group mt-9 inline-block rounded-full bg-paper px-5 py-2.5 text-[14px] font-medium text-ink transition-colors hover:bg-terra-tint"
           >
             Read a sample field report{" "}
             <span className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
