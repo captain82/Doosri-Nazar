@@ -1,13 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export default function LoginForm({ next }: { next: string }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [guestBusy, setGuestBusy] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,45 +28,84 @@ export default function LoginForm({ next }: { next: string }) {
     else setSent(true);
   };
 
+  // Instant, no-email access — a real (temporary) anonymous account, so
+  // row-level security still works and the guest can run a full flow.
+  const guest = async () => {
+    setGuestBusy(true);
+    setError(null);
+    const supabase = supabaseBrowser();
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      setGuestBusy(false);
+      setError(error.message);
+      return;
+    }
+    router.push(next);
+    router.refresh();
+  };
+
   if (sent) {
     return (
       <div className="rounded-lg border border-ok/30 bg-ok-tint px-4 py-4">
         <p className="font-medium">Check your email</p>
         <p className="mt-1 text-[14px] text-ink-soft">
           A sign-in link is on its way to <span className="font-medium text-ink">{email}</span>.
-          Open it on this device and you&apos;ll land right back here.
+          Open it on this device and you&apos;ll land right back here. (If it&apos;s not there in a
+          minute, check your spam folder.)
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className="w-full rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
-        />
-      </div>
+    <div className="space-y-5">
       {error && (
         <p className="rounded-lg border border-bad/30 bg-bad-tint px-3.5 py-2.5 text-[13px]">{error}</p>
       )}
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep disabled:opacity-40"
-      >
-        {busy ? "Sending…" : "Email me a sign-in link"}
-      </button>
-      <p className="text-center text-[12px] text-ink-soft">No password, no account setup, the link is the login.</p>
-    </form>
+
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="mb-2 block font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="w-full rounded-lg border border-line bg-card px-3.5 py-2.5 text-[15px] outline-none transition-colors placeholder:text-ink-soft/60 focus:border-ink-soft"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition-colors hover:bg-terra-deep disabled:opacity-40"
+        >
+          {busy ? "Sending…" : "Email me a sign-in link"}
+        </button>
+        <p className="text-center text-[12px] text-ink-soft">No password, no account setup, the link is the login.</p>
+      </form>
+
+      <div className="flex items-center gap-3">
+        <span className="h-px flex-1 bg-line" />
+        <span className="font-display text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">or</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <div>
+        <button
+          onClick={guest}
+          disabled={guestBusy}
+          className="w-full rounded-full border border-line bg-card px-6 py-3 text-[15px] font-medium text-ink transition-colors hover:border-ink-soft disabled:opacity-40"
+        >
+          {guestBusy ? "Setting up…" : "Continue as guest →"}
+        </button>
+        <p className="mt-2 text-center text-[12px] text-ink-soft">
+          Instant access to try a flow. Sign in by email to keep your runs.
+        </p>
+      </div>
+    </div>
   );
 }
